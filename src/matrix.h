@@ -19,6 +19,14 @@ typedef struct {
 MATRIX createMatrix(int r, int c);
 
 /**
+ * @brief Create a square identity matrix
+ * 
+ * @param s dimensions of the square matrix (i.e. 4 -> 4x4 matrix)
+ * @return MATRIX 
+ */
+MATRIX createIdentityMatrix(int s);
+
+/**
  * @brief Create a Vector object
  * 
  * @param x 

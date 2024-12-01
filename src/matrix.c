@@ -13,6 +13,14 @@ MATRIX createMatrix(int r, int c) {
 	return m;
 }
 
+MATRIX createIdentityMatrix(int s) {
+	MATRIX m = createMatrix(s, s);
+	for (int i = 0; i < s; i++) {
+		setElement(&m, i, i, 1.0);
+	}
+	return m;
+}
+
 MATRIX createVector(double x, double y, double z) {
 	MATRIX m = {3, 1, malloc( sizeof(double) * 3 )};
 	*(m.data + 0) = x;

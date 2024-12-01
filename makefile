@@ -1,6 +1,6 @@
-build/render: build/intermediate/main.o build/intermediate/list.o build/intermediate/matrix.o build/intermediate/mesh.o build/intermediate/stringUtils.o
+build/render: build/intermediate/main.o build/intermediate/list.o build/intermediate/matrix.o build/intermediate/mesh.o build/intermediate/stringUtils.o build/intermediate/render.o build/intermediate/transform.o
 	mkdir -p build
-	gcc build/intermediate/main.o build/intermediate/list.o build/intermediate/matrix.o build/intermediate/mesh.o build/intermediate/stringUtils.o -o build/render -Wall
+	gcc build/intermediate/main.o build/intermediate/list.o build/intermediate/matrix.o build/intermediate/mesh.o build/intermediate/stringUtils.o build/intermediate/render.o build/intermediate/transform.o -o build/render -Wall
 
 build/intermediate/main.o: src/main.c
 	mkdir -p build/intermediate
@@ -21,6 +21,14 @@ build/intermediate/stringUtils.o: src/stringUtils.c src/stringUtils.h
 build/intermediate/mesh.o: src/mesh.c src/mesh.h
 	mkdir -p build/intermediate
 	gcc src/mesh.c -c -o build/intermediate/mesh.o -Wall
+
+build/intermediate/render.o: src/render.c src/render.h
+	mkdir -p build/intermediate
+	gcc src/render.c -c -o build/intermediate/render.o -Wall
+
+build/intermediate/transform.o: src/transform.c src/transform.h
+	mkdir -p build/intermediate
+	gcc src/transform.c -c -o build/intermediate/transform.o -Wall
 
 clean:
 	rm -rf build

@@ -1,22 +1,26 @@
-#include "matrix.h"
 #include "list.h"
+#include "matrix.h"
+#include "transform.h"
 
 #ifndef RAYTRACE_MESH
 #define RAYTRACE_MESH
 
 typedef struct {
 	MATRIX *vertices[3];
-	MATRIX normal;
+	MATRIX *normals[3];
 } TRIANGLE;
 
 typedef struct {
 	LIST verts;
+	LIST normals;
 	LIST tris;
-	MATRIX location;
+	TRANSFORM transform;
 } MESH;
 
-MESH createMesh(TRIANGLE *tris, int triCount);
+MESH createMesh(LIST *verts, LIST *normals, LIST *tris);
 
 MESH meshFromOBJ(const char *filepath);
+
+void printMesh(MESH *m);
 
 #endif
