@@ -1,6 +1,6 @@
-build/render: build/intermediate/main.o build/intermediate/list.o build/intermediate/matrix.o build/intermediate/mesh.o build/intermediate/stringUtils.o build/intermediate/render.o build/intermediate/transform.o
+build/render: build/intermediate/main.o build/intermediate/list.o build/intermediate/matrix.o build/intermediate/mesh.o build/intermediate/stringUtils.o build/intermediate/render.o build/intermediate/transform.o build/intermediate/camera.o
 	mkdir -p build
-	gcc build/intermediate/main.o build/intermediate/list.o build/intermediate/matrix.o build/intermediate/mesh.o build/intermediate/stringUtils.o build/intermediate/render.o build/intermediate/transform.o -o build/render -Wall
+	gcc build/intermediate/main.o build/intermediate/list.o build/intermediate/matrix.o build/intermediate/mesh.o build/intermediate/stringUtils.o build/intermediate/render.o build/intermediate/transform.o build/intermediate/camera.o -o build/render -Wall
 
 build/intermediate/main.o: src/main.c
 	mkdir -p build/intermediate
@@ -29,6 +29,10 @@ build/intermediate/render.o: src/render.c src/render.h
 build/intermediate/transform.o: src/transform.c src/transform.h
 	mkdir -p build/intermediate
 	gcc src/transform.c -c -o build/intermediate/transform.o -Wall
+
+build/intermediate/camera.o: src/camera.c src/camera.h
+	mkdir -p build/intermediate
+	gcc src/camera.c -c -o build/intermediate/camera.o -Wall
 
 clean:
 	rm -rf build

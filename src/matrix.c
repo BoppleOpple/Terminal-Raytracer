@@ -22,10 +22,11 @@ MATRIX createIdentityMatrix(int s) {
 }
 
 MATRIX createVector(double x, double y, double z) {
-	MATRIX m = {3, 1, malloc( sizeof(double) * 3 )};
+	MATRIX m = {4, 1, malloc( sizeof(double) * 3 )};
 	*(m.data + 0) = x;
 	*(m.data + 1) = y;
 	*(m.data + 2) = z;
+	*(m.data + 3) = 1.0;
 	return m;
 }
 
@@ -68,6 +69,19 @@ MATRIX multMatrix(MATRIX *m1, MATRIX *m2) {
 	return m;
 }
 
+MATRIX multMatrixElementwise(MATRIX *m1, MATRIX *m2) {
+	if (m1->rows != m2->rows || m1->cols != m2->cols) {
+		printf("matrices must be the same size; given (%i, %i) and (%i, %i)\n", m1->rows, m1->cols, m2->rows, m2->cols);
+		exit(1);
+	}
+
+	MATRIX m = createMatrix(m1->rows, m1->cols);
+	for (int i = 0; i < m.rows * m.cols; i++)
+		*(m.data + i) = *(m1->data + i) * *(m2->data + i);
+
+	return m;
+}
+
 void fillMatrix(MATRIX *m, double n) {
 	for (int i = 0; i < m->rows * m->cols; i++)
 		*(m->data + i) = n;
@@ -97,6 +111,10 @@ void printMatrix(MATRIX *m) {
 		}
 		printf("%c\n", (i == m->rows - 1) ? ']' : '|');
 	}
+}
+
+void printVector3(MATRIX *m) {
+	printf("<%lf, %lf, %lf>\n", m->data[0], m->data[1], m->data[2]);
 }
 
 void freeMatrix(MATRIX *m) {

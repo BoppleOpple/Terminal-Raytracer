@@ -38,9 +38,13 @@ MATRIX createVector(double x, double y, double z);
 
 void addScalar(MATRIX *m, double s);
 
+MATRIX addMatrix(MATRIX *m1, MATRIX *m2);
+
 void multScalar(MATRIX *m, double s);
 
 MATRIX multMatrix(MATRIX *m1, MATRIX *m2);
+
+MATRIX multMatrixElementwise(MATRIX *m1, MATRIX *m2);
 
 void fillMatrix(MATRIX *m, double n);
 
@@ -49,6 +53,8 @@ double getElement(MATRIX *m, int r, int c);
 void setElement(MATRIX *m, int r, int c, double val);
 
 void printMatrix(MATRIX *m);
+
+void printVector3(MATRIX *m);
 
 /**
  * @brief Frees the data of a matrix

@@ -35,7 +35,11 @@ void scale(TRANSFORM *t, MATRIX scaleVector);
 
 void rotate(TRANSFORM *t, MATRIX rotVector);
 
+MATRIX getTransformMatrix(TRANSFORM *t);
+
 TRANSFORM combine(TRANSFORM *t1, TRANSFORM *t2);
+
+MATRIX applyTransformation(TRANSFORM *t, MATRIX *v);
 
 void printTransform(TRANSFORM *t);
 

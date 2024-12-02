@@ -1,3 +1,5 @@
+#include "camera.h"
+#include "mathUtils.h"
 #include "matrix.h"
 #include "mesh.h"
 #include "render.h"
@@ -13,6 +15,7 @@
 const unsigned int targetMicroSeconds = 1000000 / FRAME_RATE;
 
 int main(int argc, char *argv[]) {
+	CAMERA sceneCamera = createCamera(1.0);
 	struct winsize windowDims;
 	struct timespec frameStart, frameEnd;
 	char *filepath = NULL;
@@ -20,11 +23,42 @@ int main(int argc, char *argv[]) {
 	int loop = 0;
 
 	TRANSFORM testTransform = createTransform();
+	TRANSFORM testTransform2 = createTransform();
+	MATRIX transformMatrix = getTransformMatrix(&testTransform);
+	MATRIX testVector = createVector(1.0, 1.0, 1.0);
 
-	printTransform(&testTransform);
 	translate(&testTransform, createVector(3.0, 2.0, 1.0));
 	scale(&testTransform, createVector(3.0, 2.0, 1.0));
-	printTransform(&testTransform);
+	transformMatrix = getTransformMatrix(&testTransform);
+	printf("matrix 1:\n");
+	printMatrix(&transformMatrix);
+	printf("\n");
+
+	translate(&testTransform2, createVector(-5.0, 1.0, -2.0));
+	scale(&testTransform2, createVector(2.0, 2.0, 2.0));
+	rotate(&testTransform2, createVector(0.0, 0.0, PI/2));
+	transformMatrix = getTransformMatrix(&testTransform2);
+	printf("matrix 2:\n");
+	printMatrix(&transformMatrix);
+	printf("\n");
+
+	TRANSFORM combination = combine(&testTransform, &testTransform2);
+	transformMatrix = getTransformMatrix(&combination);
+	printf("combination:\n");
+	printMatrix(&transformMatrix);
+	printf("\n");
+
+	printf("transforms this vector:\n");
+	printVector3(&testVector);
+	testVector = applyTransformation(&combination, &testVector);
+	printf("into this vector:\n");
+	printVector3(&testVector);
+	printf("\n");
+
+	printf("has a rotation of:\n");
+	testVector = getRotationVector(&combination);
+	printVector3(&testVector);
+	printf("\n");
 
 	if (argc < 2) {
 		printf("please pass a mesh (.obj) file.\n");

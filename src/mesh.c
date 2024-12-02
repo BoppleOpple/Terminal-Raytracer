@@ -97,7 +97,8 @@ MESH meshFromOBJ(const char *filepath) {
 }
 
 void printMesh(MESH *m) {
-	printf("Details of mesh at (%lf, %lf, %lf):\n", m->transform.translation.data[0], m->transform.translation.data[1], m->transform.translation.data[2]);
+	MATRIX position = getTranslationVector(&m->transform);
+	printf("Details of mesh at (%lf, %lf, %lf):\n", position.data[0], position.data[1], position.data[2]);
 	printf("--| %i vertices\n", m->verts.size);
 	printf("--| %i normals\n", m->normals.size);
 	printf("--| %i tris\n", m->tris.size);
