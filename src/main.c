@@ -24,8 +24,28 @@ int main(int argc, char *argv[]) {
 
 	TRANSFORM testTransform = createTransform();
 	TRANSFORM testTransform2 = createTransform();
+	MATRIX testMatrix = createMatrix(3, 3);
 	MATRIX transformMatrix = getTransformMatrix(&testTransform);
 	MATRIX testVector = createVector(1.0, 1.0, 1.0);
+
+	setElement(&testMatrix, 0, 0, 1);
+	setElement(&testMatrix, 0, 1, 2);
+	setElement(&testMatrix, 0, 2, 3);
+	setElement(&testMatrix, 1, 0, 1);
+	setElement(&testMatrix, 1, 1, 3);
+	setElement(&testMatrix, 1, 2, 5);
+	setElement(&testMatrix, 2, 0, 1);
+	setElement(&testMatrix, 2, 1, 4);
+	setElement(&testMatrix, 2, 2, 8);
+
+	printf("test matrix:\n");
+	printMatrix(&testMatrix);
+	printf("determinant:\n");
+	printf("%lf\n", determinant(&testMatrix));
+	printf("inverse:\n");
+	testMatrix = inverse(&testMatrix);
+	printMatrix(&testMatrix);
+	printf("\n");
 
 	translate(&testTransform, createVector(3.0, 2.0, 1.0));
 	scale(&testTransform, createVector(3.0, 2.0, 1.0));

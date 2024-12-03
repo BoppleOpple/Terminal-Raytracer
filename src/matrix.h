@@ -52,6 +52,14 @@ double getElement(MATRIX *m, int r, int c);
 
 void setElement(MATRIX *m, int r, int c, double val);
 
+double minor(MATRIX *m, int r, int c);
+
+double cofactor(MATRIX *m, int r, int c);
+
+double determinant(MATRIX *m);
+
+MATRIX inverse(MATRIX *m);
+
 void printMatrix(MATRIX *m);
 
 void printVector3(MATRIX *m);

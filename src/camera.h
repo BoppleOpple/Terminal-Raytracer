@@ -10,4 +10,6 @@ typedef struct {
 
 CAMERA createCamera(double focalLength);
 
+MATRIX getCameraProjectionMatrix(CAMERA *c);
+
 #endif

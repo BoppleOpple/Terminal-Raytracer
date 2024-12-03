@@ -95,6 +95,56 @@ void setElement(MATRIX *m, int r, int c, double val) {
 	*(m->data + m->cols * r + c) = val;
 }
 
+double minor(MATRIX *m, int r, int c) {
+	MATRIX submatrix = createMatrix(m->rows-1, m->cols-1);
+	for (int i = 0; i < submatrix.rows; i++) {
+		for (int j = 0; j < submatrix.cols; j++) {
+			setElement(&submatrix, i, j, getElement(m, (i<r) ? i : i+1, (j<c) ? j : j+1));
+		}
+	}
+	return determinant(&submatrix);
+}
+
+double cofactor(MATRIX *m, int r, int c) {
+	return (((r + c) % 2) ? -1 : 1) * minor(m, r, c);
+}
+
+double determinant(MATRIX *m) {
+	if (m->rows != m->cols) {
+		printf("cannot find the determinant of non-square matrix (%ix%i)", m->rows, m->cols);
+		exit(1);
+	}
+	if (m->rows == 1)
+		return getElement(m, 0, 0);
+
+	double result = 0.0;
+
+	for (int i = 0; i < m->cols; i++)
+		result += getElement(m, 0, i) * cofactor(m, 0, i);
+	
+	return result;
+}
+
+MATRIX inverse(MATRIX *m) {
+	double det = determinant(m);
+	MATRIX result = createMatrix(m->rows, m->cols);
+
+	if (det == 0) {
+		printf("matrix is not invertible!");
+		exit(1);
+	}
+
+	for (int i = 0; i < result.rows; i++) {
+		for (int j = 0; j < result.cols; j++) {
+			setElement(&result, i, j, cofactor(m, j, i));
+		}
+	}
+
+	multScalar(&result, 1.0/det);
+
+	return result;
+}
+
 void printMatrix(MATRIX *m) {
 	int max_digits = 0;
 	char digitString[DOUBLE_STRING_LENGTH] = "";
