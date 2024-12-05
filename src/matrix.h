@@ -26,6 +26,8 @@ MATRIX createMatrix(int r, int c);
  */
 MATRIX createIdentityMatrix(int s);
 
+MATRIX copyMatrix(MATRIX *m);
+
 /**
  * @brief Create a Vector object
  * 
@@ -59,6 +61,16 @@ double cofactor(MATRIX *m, int r, int c);
 double determinant(MATRIX *m);
 
 MATRIX inverse(MATRIX *m);
+
+double vectorDotProduct(MATRIX *v1, MATRIX *v2);
+
+MATRIX vectorCrossProduct(MATRIX *v1, MATRIX *v2);
+
+double vectorLength(MATRIX *v);
+
+void normalizeVector(MATRIX *v);
+
+int isZeroMatrix(MATRIX *m);
 
 void printMatrix(MATRIX *m);
 

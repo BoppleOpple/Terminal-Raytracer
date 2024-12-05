@@ -74,13 +74,10 @@ MESH meshFromOBJ(const char *filepath) {
 				for (int i = 3; i < objLineArguments.size; i++) {
 					TRIANGLE *newTri = malloc(sizeof(TRIANGLE));
 					newTri->vertices[0] = listGetElement(&vertList, polygonVertices[0]);
-					newTri->normals[0] = listGetElement(&normalList, polygonNormals[0]);
-
 					newTri->vertices[1] = listGetElement(&vertList, polygonVertices[i-1]);
-					newTri->normals[1] = listGetElement(&normalList, polygonNormals[i-1]);
-
 					newTri->vertices[2] = listGetElement(&vertList, polygonVertices[i]);
-					newTri->normals[2] = listGetElement(&normalList, polygonNormals[i]);
+
+					newTri->normal = listGetElement(&normalList, polygonNormals[i]);
 
 					listAppendItem(&triList, newTri);
 				}

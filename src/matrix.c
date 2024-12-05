@@ -1,5 +1,6 @@
 #include "matrix.h"
 #include "mathUtils.h"
+#include <math.h>
 #include <stdio.h>
 #include <float.h>
 #include <stdlib.h>
@@ -19,6 +20,12 @@ MATRIX createIdentityMatrix(int s) {
 		setElement(&m, i, i, 1.0);
 	}
 	return m;
+}
+
+MATRIX copyMatrix(MATRIX *m) {
+	MATRIX copy = createMatrix(m->rows, m->cols);
+
+	memcpy(copy.data, m->data, sizeof(double) * m->rows * m->cols);
 }
 
 MATRIX createVector(double x, double y, double z) {
@@ -134,15 +141,49 @@ MATRIX inverse(MATRIX *m) {
 		exit(1);
 	}
 
-	for (int i = 0; i < result.rows; i++) {
-		for (int j = 0; j < result.cols; j++) {
+	for (int i = 0; i < result.rows; i++)
+		for (int j = 0; j < result.cols; j++)
 			setElement(&result, i, j, cofactor(m, j, i));
-		}
-	}
 
 	multScalar(&result, 1.0/det);
 
 	return result;
+}
+
+double vectorDotProduct(MATRIX *v1, MATRIX *v2) {
+	double result = 0.0;
+	for (int i = 0; i < v1->rows; i++)
+		result += getElement(v1, i, 0)*getElement(v2, i, 0);
+	
+	return result;
+}
+
+MATRIX vectorCrossProduct(MATRIX *v1, MATRIX *v2) {
+	return createVector(
+		getElement(v1, 1, 0)*getElement(v2, 2, 0) - getElement(v1, 2, 0)*getElement(v2, 1, 0),
+		getElement(v1, 2, 0)*getElement(v2, 0, 0) - getElement(v1, 0, 0)*getElement(v2, 2, 0),
+		getElement(v1, 0, 0)*getElement(v2, 1, 0) - getElement(v1, 1, 0)*getElement(v2, 0, 0)
+	);
+}
+
+double vectorLength(MATRIX *v) {
+	return sqrt(
+		pow(getElement(v, 0, 0), 2.0) +
+		pow(getElement(v, 1, 0), 2.0) +
+		pow(getElement(v, 2, 0), 2.0)
+	);
+}
+
+void normalizeVector(MATRIX *v) {
+	multScalar(v, 1.0/vectorLength(v));
+}
+
+int isZeroMatrix(MATRIX *m) {
+	for (int i = 0; i < m->rows; i++)
+		for (int j = 0; j < m->cols; j++)
+			if (getElement(m, i, j) != 0.0) return 1;
+	
+	return 1;
 }
 
 void printMatrix(MATRIX *m) {

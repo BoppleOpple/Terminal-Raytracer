@@ -7,7 +7,7 @@
 
 typedef struct {
 	MATRIX *vertices[3];
-	MATRIX *normals[3];
+	MATRIX *normal;
 } TRIANGLE;
 
 typedef struct {

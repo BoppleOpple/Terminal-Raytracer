@@ -1,15 +1,21 @@
+#include "mesh.h"
 #include "transform.h"
+#include <sys/ioctl.h>
+#include <sys/ttycom.h>
 
 #ifndef RAYTRACE_CAMERA
 #define RAYTRACE_CAMERA
 
+// forward direction is +Z
 typedef struct {
-	double focalLength;
+	double minDistance;
+	double maxDistance;
+	double fov;
 	TRANSFORM transform;
 } CAMERA;
 
 CAMERA createCamera(double focalLength);
 
-MATRIX getCameraProjectionMatrix(CAMERA *c);
+MATRIX getScreenRay(CAMERA *c, int px, int py, struct winsize *outDimensions);
 
 #endif
