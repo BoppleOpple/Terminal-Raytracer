@@ -1,9 +1,12 @@
 #include "render.h"
 #include "matrix.h"
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
+// const char *CHARACTERS = " `.-:><+*o0@";
 const char *CHARACTERS = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
 
 IMPACT *createImpact(MATRIX *position, TRIANGLE *impactedTri, double distance) {
@@ -25,13 +28,15 @@ char *renderToString(CAMERA *c, struct winsize *outDimensions, MESH *m) {
 	char *output = malloc(sizeof(char) * outDimensions->ws_row * (outDimensions->ws_col + 1) + 1);
 	MATRIX *cameraPosition = getTranslationVector(c->transform);
 
+	int numCharacters = strlen(CHARACTERS);
+
 	for (int i = 0; i < outDimensions->ws_row; i++) {
 		for (int j = 0; j < outDimensions->ws_col; j++) {
 			MATRIX *ray = getScreenRay(c, j, i, outDimensions);
 
 			IMPACT *result = getRayMeshImpact(ray, cameraPosition, m);
 
-			*(output + i * (outDimensions->ws_col + 1) + j) = (result) ? '0' : ' ';
+			*(output + i * (outDimensions->ws_col + 1) + j) = (result) ? *(CHARACTERS + (int) ((1 - (result->impactDistance - c->minDistance) / c->maxDistance) * numCharacters) % numCharacters) : ' ';
 			// printVector3(&ray);
 		}
 		*(output + i * (outDimensions->ws_col + 1) + outDimensions->ws_col) = (i == outDimensions->ws_row - 1) ? 0 : '\n';
