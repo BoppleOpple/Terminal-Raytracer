@@ -6,7 +6,12 @@
 
 char *slice(const char *s, int start, int end) {
 	char *substring = malloc(sizeof(char) * (end - start + 1));
-	memcpy(substring, s + start, sizeof(char) * (end - start));
+	
+	for (int i = start; i < end; i++)
+		*(substring + i - start) = *(s + i);
+
+	*(substring + end - start) = 0;
+
 	return substring;
 }
 

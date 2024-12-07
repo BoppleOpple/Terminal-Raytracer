@@ -14,12 +14,12 @@ typedef struct {
 	LIST verts;
 	LIST normals;
 	LIST tris;
-	TRANSFORM transform;
+	TRANSFORM *transform;
 } MESH;
 
-MESH createMesh(LIST *verts, LIST *normals, LIST *tris);
+MESH *createMesh();
 
-MESH meshFromOBJ(const char *filepath);
+MESH *meshFromOBJ(const char *filepath);
 
 void printMesh(MESH *m);
 

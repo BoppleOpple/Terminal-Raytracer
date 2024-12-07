@@ -1,8 +1,8 @@
 #include "camera.h"
-#include "mathUtils.h"
 #include "matrix.h"
 #include "mesh.h"
 #include "render.h"
+#include "stringUtils.h"
 #include "transform.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,12 +10,12 @@
 #include <time.h>
 #include <unistd.h> // for sleep on linux
 
-#define FRAME_RATE 60
+#define FRAME_RATE 20
 
 const unsigned int targetMicroSeconds = 1000000 / FRAME_RATE;
 
 int main(int argc, char *argv[]) {
-	CAMERA sceneCamera = createCamera(1.0);
+	CAMERA *sceneCamera = createCamera(1.0);
 	struct winsize windowDims;
 	struct timespec frameStart, frameEnd;
 	char *filepath = NULL;
@@ -23,77 +23,57 @@ int main(int argc, char *argv[]) {
 	int loop = 1;
 	int debug = 0;
 
-	translate(&sceneCamera.transform, createVector(-2.0, 0.0, 0.0));
+	translate(sceneCamera->transform, createVector(-2.0, 0.0, 0.0));
 
-	MATRIX testVector1 = createVector(1.0, 1.0, 0.0);
-	MATRIX testVector2 = createVector(2.0, 2.0, 0.0);
+	MATRIX *testVector1 = createVector(1.0, 1.0, 0.0);
+	MATRIX *testVector2 = createVector(2.0, 2.0, 0.0);
 
 	printf("vector a:\n");
-	printVector3(&testVector1);
+	printVector3(testVector1);
 	printf("vector b:\n");
-	printVector3(&testVector2);
-	printf("vector b:\n");
-	MATRIX result = vectorCrossProduct(&testVector1, &testVector2);
-	printVector3(&result);
+	printVector3(testVector2);
+	printf("vector a x b:\n");
+	MATRIX *result = vectorCrossProduct(testVector1, testVector2);
+	printVector3(result);
+	printf("vector a * b:\n");
+	double dotResult = vectorDotProduct(testVector1, testVector2);
+	printf("%lf\n", dotResult);
 	printf("\n");
 
-	// TRANSFORM testTransform = createTransform();
-	// TRANSFORM testTransform2 = createTransform();
-	// MATRIX testMatrix = createMatrix(3, 3);
-	// MATRIX transformMatrix = getTransformMatrix(&testTransform);
-	// MATRIX testVector = createVector(1.0, 1.0, 1.0);
+	freeMatrix(testVector1);
+	freeMatrix(testVector2);
+	freeMatrix(result);
+	free(testVector1);
+	free(testVector2);
+	free(result);
+	testVector1 = NULL;
+	testVector2 = NULL;
+	result = NULL;
 
-	// setElement(&testMatrix, 0, 0, 1);
-	// setElement(&testMatrix, 0, 1, 2);
-	// setElement(&testMatrix, 0, 2, 3);
-	// setElement(&testMatrix, 1, 0, 1);
-	// setElement(&testMatrix, 1, 1, 3);
-	// setElement(&testMatrix, 1, 2, 5);
-	// setElement(&testMatrix, 2, 0, 1);
-	// setElement(&testMatrix, 2, 1, 4);
-	// setElement(&testMatrix, 2, 2, 8);
+	MATRIX *ray = createVector(0.0, 0.0, 1.0);
+	MATRIX *rayOrigin = createVector(0.0, 0.0, -3.0);
+	MATRIX *normal = createVector(0.0, 0.0, -1.0);
+	MATRIX *normalOrigin = createVector(0.0, 0.0, 0.0);
 
-	// printf("test matrix:\n");
-	// printMatrix(&testMatrix);
-	// printf("determinant:\n");
-	// printf("%lf\n", determinant(&testMatrix));
-	// printf("inverse:\n");
-	// testMatrix = inverse(&testMatrix);
-	// printMatrix(&testMatrix);
-	// printf("\n");
+	IMPACT *impact = getRayPlaneImpact(ray, rayOrigin, normal, normalOrigin);
+	printImpact(impact);
 
-	// translate(&testTransform, createVector(3.0, 2.0, 1.0));
-	// scale(&testTransform, createVector(3.0, 2.0, 1.0));
-	// transformMatrix = getTransformMatrix(&testTransform);
-	// printf("matrix 1:\n");
-	// printMatrix(&transformMatrix);
-	// printf("\n");
+	freeMatrix(ray);
+	freeMatrix(rayOrigin);
+	freeMatrix(normal);
+	freeMatrix(normalOrigin);
+	free(ray);
+	free(rayOrigin);
+	free(normal);
+	free(normalOrigin);
+	ray = NULL;
+	rayOrigin = NULL;
+	normal = NULL;
+	normalOrigin = NULL;
 
-	// translate(&testTransform2, createVector(-5.0, 1.0, -2.0));
-	// scale(&testTransform2, createVector(2.0, 2.0, 2.0));
-	// rotate(&testTransform2, createVector(0.0, 0.0, PI/2));
-	// transformMatrix = getTransformMatrix(&testTransform2);
-	// printf("matrix 2:\n");
-	// printMatrix(&transformMatrix);
-	// printf("\n");
-
-	// TRANSFORM combination = combine(&testTransform, &testTransform2);
-	// transformMatrix = getTransformMatrix(&combination);
-	// printf("combination:\n");
-	// printMatrix(&transformMatrix);
-	// printf("\n");
-
-	// printf("transforms this vector:\n");
-	// printVector3(&testVector);
-	// testVector = applyTransformation(&combination, &testVector);
-	// printf("into this vector:\n");
-	// printVector3(&testVector);
-	// printf("\n");
-
-	// printf("has a rotation of:\n");
-	// testVector = getRotationVector(&combination);
-	// printVector3(&testVector);
-	// printf("\n");
+	freeImpact(impact);
+	free(impact);
+	impact = NULL;
 
 	if (argc < 2) {
 		printf("please pass a mesh (.obj) file.\n");
@@ -101,8 +81,27 @@ int main(int argc, char *argv[]) {
 	}
 	filepath = argv[1];
 
-	MESH testMesh = meshFromOBJ(filepath);
-	printMesh(&testMesh);
+	char example[] = "this is a test string.";
+
+	char *first5 = slice(example, 0, 5);
+
+	printf("Test string:\n");
+	printf("%s\n", example);
+	printf("Truncated:\n");
+	printf("%s\n", first5);
+	printf("\n");
+
+	LIST wordList = splitSpaces(example);
+	listPrint(&wordList, "\"%s\"");
+
+	LIST splitAtT = split(example, 't');
+	listPrint(&splitAtT, "\"%s\"");
+
+
+
+	MESH *testMesh = meshFromOBJ(filepath);
+	// rotate(&testMesh.transform, createVector(0, 0, PI));
+	// printMesh(&testMesh);
 
 	while (loop) {
 		clock_gettime(CLOCK_MONOTONIC_RAW, &frameStart);
@@ -110,10 +109,11 @@ int main(int argc, char *argv[]) {
 		// do things!
 		updateViewportSize(&windowDims);
 
-		clearScreen();
-		printf("%s", renderToString(&sceneCamera, &windowDims, &testMesh));
+		rotate(testMesh->transform, createVector(0.0, 0.0, 0.1));
 
-		// renderToStdOut(&sceneCamera, &windowDims);
+		clearScreen();
+		printf("%s", renderToString(sceneCamera, &windowDims, testMesh));
+
 
 		if (debug) {
 			printf("frame %i\n", frame++);
@@ -131,7 +131,5 @@ int main(int argc, char *argv[]) {
 
 		if (deltaMicroSeconds < targetMicroSeconds) 
 			usleep(targetMicroSeconds - deltaMicroSeconds);
-
-		exit(0);
 	}
 }

@@ -8,32 +8,42 @@
 
 #define DOUBLE_STRING_LENGTH 3 + DBL_MANT_DIG - DBL_MIN_EXP
 
-MATRIX createMatrix(int r, int c) {
-	MATRIX m = {r, c, malloc( sizeof(double) * r * c )};
-	fillMatrix(&m, 0.0);
+MATRIX createTempMatrix(int r, int c) {
+	return (MATRIX) {r, c, malloc( sizeof(double) * r * c )};
+}
+
+MATRIX *createMatrix(int r, int c) {
+	MATRIX *m = malloc(sizeof(MATRIX));
+	*m = createTempMatrix(r, c);
+	fillMatrix(m, 0.0);
 	return m;
 }
 
-MATRIX createIdentityMatrix(int s) {
-	MATRIX m = createMatrix(s, s);
-	for (int i = 0; i < s; i++) {
-		setElement(&m, i, i, 1.0);
-	}
+MATRIX *createIdentityMatrix(int s) {
+	MATRIX *m = createMatrix(s, s);
+	for (int i = 0; i < s; i++)
+		setElement(m, i, i, 1.0);
+	
 	return m;
 }
 
-MATRIX copyMatrix(MATRIX *m) {
-	MATRIX copy = createMatrix(m->rows, m->cols);
+MATRIX *copyMatrix(MATRIX *m) {
+	MATRIX *copy = createMatrix(m->rows, m->cols);
 
-	memcpy(copy.data, m->data, sizeof(double) * m->rows * m->cols);
+	for (int i = 0; i < m->rows * m->cols; i++)
+		*(copy->data + i) = *(m->data + i);
+
+	return copy;
 }
 
-MATRIX createVector(double x, double y, double z) {
-	MATRIX m = {4, 1, malloc( sizeof(double) * 3 )};
-	*(m.data + 0) = x;
-	*(m.data + 1) = y;
-	*(m.data + 2) = z;
-	*(m.data + 3) = 1.0;
+MATRIX *createVector(double x, double y, double z) {
+	MATRIX *m = malloc(sizeof(MATRIX));
+	
+	*m = (MATRIX) {4, 1, malloc( sizeof(double) * 4 )};
+	*(m->data + 0) = x;
+	*(m->data + 1) = y;
+	*(m->data + 2) = z;
+	*(m->data + 3) = 1.0;
 	return m;
 }
 
@@ -42,17 +52,19 @@ void addScalar(MATRIX *m, double s) {
 		*(m->data + i) += s;
 }
 
-MATRIX addMatrix(MATRIX *m1, MATRIX *m2) {
+void addMatrix(MATRIX *m1, MATRIX *m2) {
 	if (m1->rows != m2->rows || m1->cols != m2->cols) {
 		printf("matrices must be the same size; given (%i, %i) and (%i, %i)\n", m1->rows, m1->cols, m2->rows, m2->cols);
 		exit(1);
 	}
 
-	MATRIX m = createMatrix(m1->rows, m1->cols);
-	for (int i = 0; i < m.rows * m.cols; i++)
-		*(m.data + i) = *(m1->data + i) + *(m2->data + i);
+	MATRIX result = createTempMatrix(m1->rows, m1->cols);
+	for (int i = 0; i < result.rows * result.cols; i++)
+		*(result.data + i) = *(m1->data + i) + *(m2->data + i);
+	
+	freeMatrix(m1);
 
-	return m;
+	*m1 = result;
 }
 
 void multScalar(MATRIX *m, double s) {
@@ -60,33 +72,46 @@ void multScalar(MATRIX *m, double s) {
 		*(m->data + i) *= s;
 }
 
-MATRIX multMatrix(MATRIX *m1, MATRIX *m2) {
+void multMatrixTo(MATRIX *m1, MATRIX *m2, MATRIX **dst) {
 	if (m1->cols != m2->rows) {
 		printf("matrices must be size m x n and n x p; given (%i, %i) and (%i, %i)\n", m1->rows, m1->cols, m2->rows, m2->cols);
 		exit(1);
 	}
 
-	MATRIX m = createMatrix(m1->rows, m2->cols);
+	MATRIX m = createTempMatrix(m1->rows, m2->cols);
 
 	for (int i = 0; i < m.rows; i++)
 		for (int j = 0; j < m.cols; j++)
 			for (int k = 0; k < m1->cols; k++)
 				setElement(&m, i, j, getElement(&m, i, j) + getElement(m1, i, k)*getElement(m2, k, j) );
 	
-	return m;
+	if (*dst) {
+		// printf("dst exists ig: %p\n", dst);
+		freeMatrix(*dst);
+	} else {
+		*dst = malloc(sizeof(MATRIX));
+		// printf("allocating (%i, %i) matrix\n", m.rows, m.cols);
+	}
+	**dst = m;
 }
 
-MATRIX multMatrixElementwise(MATRIX *m1, MATRIX *m2) {
+void multMatrix(MATRIX *m1, MATRIX *m2) {
+	multMatrixTo(m1, m2, &m1);
+}
+
+void multMatrixElementwise(MATRIX *m1, MATRIX *m2) {
 	if (m1->rows != m2->rows || m1->cols != m2->cols) {
 		printf("matrices must be the same size; given (%i, %i) and (%i, %i)\n", m1->rows, m1->cols, m2->rows, m2->cols);
 		exit(1);
 	}
 
-	MATRIX m = createMatrix(m1->rows, m1->cols);
+	MATRIX m = createTempMatrix(m1->rows, m1->cols);
 	for (int i = 0; i < m.rows * m.cols; i++)
 		*(m.data + i) = *(m1->data + i) * *(m2->data + i);
 
-	return m;
+	freeMatrix(m1);
+	
+	*m1 = m;
 }
 
 void fillMatrix(MATRIX *m, double n) {
@@ -103,13 +128,17 @@ void setElement(MATRIX *m, int r, int c, double val) {
 }
 
 double minor(MATRIX *m, int r, int c) {
-	MATRIX submatrix = createMatrix(m->rows-1, m->cols-1);
-	for (int i = 0; i < submatrix.rows; i++) {
-		for (int j = 0; j < submatrix.cols; j++) {
-			setElement(&submatrix, i, j, getElement(m, (i<r) ? i : i+1, (j<c) ? j : j+1));
-		}
-	}
-	return determinant(&submatrix);
+	MATRIX *submatrix = createMatrix(m->rows-1, m->cols-1);
+	for (int i = 0; i < submatrix->rows; i++)
+		for (int j = 0; j < submatrix->cols; j++)
+			setElement(submatrix, i, j, getElement(m, (i<r) ? i : i+1, (j<c) ? j : j+1));
+	
+	double result = determinant(submatrix);
+
+	freeMatrix(submatrix);
+	free(submatrix);
+	
+	return result;
 }
 
 double cofactor(MATRIX *m, int r, int c) {
@@ -132,33 +161,33 @@ double determinant(MATRIX *m) {
 	return result;
 }
 
-MATRIX inverse(MATRIX *m) {
+MATRIX *getInverse(MATRIX *m) {
 	double det = determinant(m);
-	MATRIX result = createMatrix(m->rows, m->cols);
+	MATRIX *result = createMatrix(m->rows, m->cols);
 
 	if (det == 0) {
 		printf("matrix is not invertible!");
 		exit(1);
 	}
 
-	for (int i = 0; i < result.rows; i++)
-		for (int j = 0; j < result.cols; j++)
-			setElement(&result, i, j, cofactor(m, j, i));
+	for (int i = 0; i < result->rows; i++)
+		for (int j = 0; j < result->cols; j++)
+			setElement(result, i, j, cofactor(m, j, i));
 
-	multScalar(&result, 1.0/det);
+	multScalar(result, 1.0/det);
 
 	return result;
 }
 
 double vectorDotProduct(MATRIX *v1, MATRIX *v2) {
 	double result = 0.0;
-	for (int i = 0; i < v1->rows; i++)
+	for (int i = 0; i < v1->rows - 1; i++)
 		result += getElement(v1, i, 0)*getElement(v2, i, 0);
 	
 	return result;
 }
 
-MATRIX vectorCrossProduct(MATRIX *v1, MATRIX *v2) {
+MATRIX *vectorCrossProduct(MATRIX *v1, MATRIX *v2) {
 	return createVector(
 		getElement(v1, 1, 0)*getElement(v2, 2, 0) - getElement(v1, 2, 0)*getElement(v2, 1, 0),
 		getElement(v1, 2, 0)*getElement(v2, 0, 0) - getElement(v1, 0, 0)*getElement(v2, 2, 0),

@@ -2,26 +2,32 @@
 #include "mathUtils.h"
 #include "matrix.h"
 #include <math.h>
+#include <stdlib.h>
 
-CAMERA createCamera(double focalLength) {
-	return (CAMERA) {
+CAMERA *createCamera(double focalLength) {
+	CAMERA *c = malloc(sizeof(CAMERA));
+	*c = (CAMERA) {
 		0.0,
 		10.0,
-		PI / 2.0,
+		PI / 3.0,
 		createTransform()
 	};
+
+	return c;
 }
 
-MATRIX getScreenRay(CAMERA *c, int px, int py, struct winsize *outDimensions) {
+MATRIX *getScreenRay(CAMERA *c, int px, int py, struct winsize *outDimensions) {
 	// scale depends on height, so x = px / width * (width / height) and y = py / height
 	double aspectRatio = (double) outDimensions->ws_col / outDimensions->ws_row;
-	double screenPositionX = 2.0 * (px - (double) outDimensions->ws_col / 2.0) / outDimensions->ws_col * aspectRatio;
+	double screenPositionX = 2.0 * (px - (double) outDimensions->ws_col / 2.0) / outDimensions->ws_col;
 	double screenPositionY = 2.0 * (py - (double) outDimensions->ws_row / 2.0) / outDimensions->ws_row;
 
-	MATRIX imagePlaneSize = createVector(cos(c->fov / 2.0), sin(c->fov / 2.0), 1.0);
-	MATRIX result = createVector(screenPositionX, screenPositionY, 1.0);
-	result = multMatrixElementwise(&imagePlaneSize, &result);
-	normalizeVector(&result);
+	// printf("%lf, %lf\n", screenPositionX, screenPositionY);
+
+	MATRIX *imagePlaneSize = createVector(1.0, cos(c->fov / 2.0), sin(c->fov / 2.0));
+	MATRIX *result = createVector(1.0, screenPositionX, screenPositionY);
+	multMatrixElementwise(imagePlaneSize, result);
+	normalizeVector(result);
 	
 	return result;
 }

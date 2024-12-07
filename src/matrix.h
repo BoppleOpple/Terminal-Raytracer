@@ -16,7 +16,7 @@ typedef struct {
  * @param c Number of columns
  * @return MATRIX New zero matrix
  */
-MATRIX createMatrix(int r, int c);
+MATRIX *createMatrix(int r, int c);
 
 /**
  * @brief Create a square identity matrix
@@ -24,9 +24,9 @@ MATRIX createMatrix(int r, int c);
  * @param s dimensions of the square matrix (i.e. 4 -> 4x4 matrix)
  * @return MATRIX 
  */
-MATRIX createIdentityMatrix(int s);
+MATRIX *createIdentityMatrix(int s);
 
-MATRIX copyMatrix(MATRIX *m);
+MATRIX *copyMatrix(MATRIX *m);
 
 /**
  * @brief Create a Vector object
@@ -36,17 +36,19 @@ MATRIX copyMatrix(MATRIX *m);
  * @param z 
  * @return MATRIX 
  */
-MATRIX createVector(double x, double y, double z);
+MATRIX *createVector(double x, double y, double z);
 
 void addScalar(MATRIX *m, double s);
 
-MATRIX addMatrix(MATRIX *m1, MATRIX *m2);
+void addMatrix(MATRIX *m1, MATRIX *m2);
 
 void multScalar(MATRIX *m, double s);
 
-MATRIX multMatrix(MATRIX *m1, MATRIX *m2);
+void multMatrixTo(MATRIX *m1, MATRIX *m2, MATRIX **dst);
 
-MATRIX multMatrixElementwise(MATRIX *m1, MATRIX *m2);
+void multMatrix(MATRIX *m1, MATRIX *m2);
+
+void multMatrixElementwise(MATRIX *m1, MATRIX *m2);
 
 void fillMatrix(MATRIX *m, double n);
 
@@ -60,11 +62,11 @@ double cofactor(MATRIX *m, int r, int c);
 
 double determinant(MATRIX *m);
 
-MATRIX inverse(MATRIX *m);
+MATRIX *getInverse(MATRIX *m);
 
 double vectorDotProduct(MATRIX *v1, MATRIX *v2);
 
-MATRIX vectorCrossProduct(MATRIX *v1, MATRIX *v2);
+MATRIX *vectorCrossProduct(MATRIX *v1, MATRIX *v2);
 
 double vectorLength(MATRIX *v);
 

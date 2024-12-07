@@ -1,7 +1,6 @@
 #include "mesh.h"
 #include "transform.h"
 #include <sys/ioctl.h>
-#include <sys/ttycom.h>
 
 #ifndef RAYTRACE_CAMERA
 #define RAYTRACE_CAMERA
@@ -11,11 +10,11 @@ typedef struct {
 	double minDistance;
 	double maxDistance;
 	double fov;
-	TRANSFORM transform;
+	TRANSFORM *transform;
 } CAMERA;
 
-CAMERA createCamera(double focalLength);
+CAMERA *createCamera(double focalLength);
 
-MATRIX getScreenRay(CAMERA *c, int px, int py, struct winsize *outDimensions);
+MATRIX *getScreenRay(CAMERA *c, int px, int py, struct winsize *outDimensions);
 
 #endif

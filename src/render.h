@@ -6,13 +6,12 @@
 #define RAYTRACE_RENDER
 
 typedef struct {
-	MATRIX impactPosition;
+	MATRIX *impactPosition;
 	TRIANGLE *impactTri;
 	double impactDistance;
-	int insideTri;
 } IMPACT;
 
-IMPACT createImpact(MATRIX position, TRIANGLE *impactedTri, double distance, int contained);
+IMPACT *createImpact(MATRIX *position, TRIANGLE *impactedTri, double distance);
 
 void updateViewportSize(struct winsize *destination);
 
@@ -23,5 +22,11 @@ void clearScreen();
 IMPACT *getRayMeshImpact(MATRIX *ray, MATRIX *rayOrigin, MESH *m);
 
 IMPACT *getRayTriImpact(MATRIX *ray, MATRIX *rayOrigin, TRIANGLE *tri);
+
+IMPACT *getRayPlaneImpact(MATRIX *ray, MATRIX *rayOrigin, MATRIX *normal, MATRIX *normalOrigin);
+
+void freeImpact(IMPACT* i);
+
+void printImpact(IMPACT *i);
 
 #endif

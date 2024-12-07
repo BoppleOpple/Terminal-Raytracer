@@ -4,42 +4,48 @@
 #define RAYTRACE_TRANSFORM
 
 typedef struct {
-	MATRIX translation;
-	MATRIX scale;
-	MATRIX rotation;
+	MATRIX *translation;
+	MATRIX *scale;
+	MATRIX *rotation;
 } TRANSFORM;
 
-TRANSFORM createTransform();
+TRANSFORM *createTransform();
 
-MATRIX createTranslationMatrix(MATRIX posVector);
+MATRIX *createTranslationMatrix(MATRIX *posVector);
 
-MATRIX createScaleMatrix(MATRIX scaleVector);
+MATRIX *createScaleMatrix(MATRIX *scaleVector);
 
-MATRIX createRotationMatrix(MATRIX rotVector);
+MATRIX *createRotationMatrix(MATRIX *rotVector);
 
-void setTranslation(TRANSFORM *t, MATRIX posVector);
+void setTranslation(TRANSFORM *t, MATRIX *posVector);
 
-void setScale(TRANSFORM *t, MATRIX scaleVector);
+void setScale(TRANSFORM *t, MATRIX *scaleVector);
 
-void setRotation(TRANSFORM *t, MATRIX rotVector);
+void setRotation(TRANSFORM *t, MATRIX *rotVector);
 
-MATRIX getTranslationVector(TRANSFORM *t);
+MATRIX *getTranslationVector(TRANSFORM *t);
 
-MATRIX getScaleVector(TRANSFORM *t);
+MATRIX *getScaleVector(TRANSFORM *t);
 
-MATRIX getRotationVector(TRANSFORM *t);
+MATRIX *getRotationVector(TRANSFORM *t);
 
-void translate(TRANSFORM *t, MATRIX posVector);
+void translate(TRANSFORM *t, MATRIX *posVector);
 
-void scale(TRANSFORM *t, MATRIX scaleVector);
+void translateXYZ(TRANSFORM *t, double x, double y, double z);
 
-void rotate(TRANSFORM *t, MATRIX rotVector);
+void scale(TRANSFORM *t, MATRIX *scaleVector);
 
-MATRIX getTransformMatrix(TRANSFORM *t);
+void scaleXYZ(TRANSFORM *t, double x, double y, double z);
 
-TRANSFORM combine(TRANSFORM *t1, TRANSFORM *t2);
+void rotate(TRANSFORM *t, MATRIX *rotVector);
 
-MATRIX applyTransformation(TRANSFORM *t, MATRIX *v);
+void rotateXYZ(TRANSFORM *t, double x, double y, double z);
+
+MATRIX *getTransformMatrix(TRANSFORM *t);
+
+TRANSFORM *combine(TRANSFORM *t1, TRANSFORM *t2);
+
+void applyTransformation(TRANSFORM *t, MATRIX *v);
 
 void printTransform(TRANSFORM *t);
 
