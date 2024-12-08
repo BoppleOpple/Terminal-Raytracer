@@ -38,9 +38,22 @@ char *renderToString(CAMERA *c, struct winsize *outDimensions, MESH *m) {
 
 			*(output + i * (outDimensions->ws_col + 1) + j) = (result) ? *(CHARACTERS + (int) ((1 - (result->impactDistance - c->minDistance) / c->maxDistance) * numCharacters) % numCharacters) : ' ';
 			// printVector3(&ray);
+
+			freeMatrix(ray);
+			free(ray);
+			ray = NULL;
+			if (result) {
+				freeImpact(result);
+				free(result);
+				result = NULL;
+			}
 		}
 		*(output + i * (outDimensions->ws_col + 1) + outDimensions->ws_col) = (i == outDimensions->ws_row - 1) ? 0 : '\n';
 	}
+
+	freeMatrix(cameraPosition);
+	free(cameraPosition);
+	cameraPosition = NULL;
 
 	return output;
 }
@@ -75,11 +88,26 @@ IMPACT *getRayMeshImpact(MATRIX *ray, MATRIX *rayOrigin, MESH *m) { // maybe add
 		} else {
 			freeImpact(currentImpact);
 			free(currentImpact);
+			currentImpact = NULL;
 		}
 	}
 
 	if (closestImpact)
 		multMatrixTo(meshTransformationMatrix, closestImpact->impactPosition,&closestImpact->impactPosition);
+
+	freeMatrix(meshTransformationMatrix);
+	freeMatrix(inverseMeshTransformationMatrix);
+	freeMatrix(relativeRay);
+	freeMatrix(relativeRayOrigin);
+	free(meshTransformationMatrix);
+	free(inverseMeshTransformationMatrix);
+	free(relativeRay);
+	free(relativeRayOrigin);
+	meshTransformationMatrix = NULL;
+	inverseMeshTransformationMatrix = NULL;
+	relativeRay = NULL;
+	relativeRayOrigin = NULL;
+
 
 	return closestImpact;
 }
@@ -121,6 +149,31 @@ IMPACT *getRayTriImpact(MATRIX *ray, MATRIX *rayOrigin, TRIANGLE *tri) {
 	if (vectorDotProduct(impactOffset2, vertexOffset2) < 0.0) return NULL;
 	if (vectorDotProduct(impactOffset3, vertexOffset3) < 0.0) return NULL;
 
+	freeMatrix(negativeVertex1);
+	freeMatrix(negativeVertex2);
+	freeMatrix(negativeVertex3);
+	freeMatrix(impactOffset1);
+	freeMatrix(impactOffset2);
+	freeMatrix(impactOffset3);
+	freeMatrix(vertexOffset2);
+	freeMatrix(vertexOffset3);
+	free(negativeVertex1);
+	free(negativeVertex2);
+	free(negativeVertex3);
+	free(impactOffset1);
+	free(impactOffset2);
+	free(impactOffset3);
+	free(vertexOffset2);
+	free(vertexOffset3);
+	negativeVertex1 = NULL;
+	negativeVertex2 = NULL;
+	negativeVertex3 = NULL;
+	impactOffset1 = NULL;
+	impactOffset2 = NULL;
+	impactOffset3 = NULL;
+	vertexOffset2 = NULL;
+	vertexOffset3 = NULL;
+
 	return result;
 }
 
@@ -140,6 +193,9 @@ IMPACT *getRayPlaneImpact(MATRIX *ray, MATRIX *rayOrigin, MATRIX *normal, MATRIX
 
 	addMatrix(impactPoint, rayOrigin);
 
+	freeMatrix(relativeOrigin);
+	free(relativeOrigin);
+	relativeOrigin = NULL;
 
 	return createImpact(impactPoint, NULL, distance);
 }

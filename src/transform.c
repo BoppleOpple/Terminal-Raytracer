@@ -82,10 +82,18 @@ MATRIX *createRotationMatrix(MATRIX *rotVector) {
 }
 
 void setTranslation(TRANSFORM *t, MATRIX *posVector) {
+	if (t->translation) {
+		freeMatrix(t->translation);
+		free(t->translation);
+	}
 	t->translation = createTranslationMatrix(posVector);
 }
 
 void setScale(TRANSFORM *t, MATRIX *scaleVector) {
+	if (t->scale) {
+		freeMatrix(t->scale);
+		free(t->scale);
+	}
 	t->scale = createScaleMatrix(scaleVector);
 }
 

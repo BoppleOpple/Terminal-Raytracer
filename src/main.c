@@ -14,17 +14,7 @@
 
 const unsigned int targetMicroSeconds = 1000000 / FRAME_RATE;
 
-int main(int argc, char *argv[]) {
-	CAMERA *sceneCamera = createCamera(1.0);
-	struct winsize windowDims;
-	struct timespec frameStart, frameEnd;
-	char *filepath = NULL;
-	int frame = 0;
-	int loop = 1;
-	int debug = 0;
-
-	translate(sceneCamera->transform, createVector(-2.0, 0.0, 0.0));
-
+void test() {
 	MATRIX *testVector1 = createVector(1.0, 1.0, 0.0);
 	MATRIX *testVector2 = createVector(2.0, 2.0, 0.0);
 
@@ -74,6 +64,20 @@ int main(int argc, char *argv[]) {
 	freeImpact(impact);
 	free(impact);
 	impact = NULL;
+}
+
+int main(int argc, char *argv[]) {
+	CAMERA *sceneCamera = createCamera(1.0);
+	struct winsize windowDims;
+	struct timespec frameStart, frameEnd;
+	char *filepath = NULL;
+	int frame = 0;
+	int loop = 1;
+	int debug = 0;
+
+	translateXYZ(sceneCamera->transform, -5.0, 0.0, 0.0);
+
+	test();
 
 	if (argc < 2) {
 		printf("please pass a mesh (.obj) file.\n");
@@ -100,8 +104,8 @@ int main(int argc, char *argv[]) {
 
 
 	MESH *testMesh = meshFromOBJ(filepath);
-	// rotate(&testMesh.transform, createVector(0, 0, PI));
-	// printMesh(&testMesh);
+	// rotateXYZ(testMesh->transform, 0, 0, PI);
+	// printMesh(testMesh);
 
 	while (loop) {
 		clock_gettime(CLOCK_MONOTONIC_RAW, &frameStart);
@@ -109,11 +113,13 @@ int main(int argc, char *argv[]) {
 		// do things!
 		updateViewportSize(&windowDims);
 
-		rotate(testMesh->transform, createVector(0.0, 0.0, 0.1));
+		rotateXYZ(testMesh->transform, 0.0, 0.0, 0.1);
 
 		clearScreen();
-		printf("%s", renderToString(sceneCamera, &windowDims, testMesh));
-
+		char *screenString = renderToString(sceneCamera, &windowDims, testMesh);
+		printf("%s", screenString);
+		free(screenString);
+		screenString = NULL;
 
 		if (debug) {
 			printf("frame %i\n", frame++);
@@ -131,5 +137,7 @@ int main(int argc, char *argv[]) {
 
 		if (deltaMicroSeconds < targetMicroSeconds) 
 			usleep(targetMicroSeconds - deltaMicroSeconds);
+
+		// exit(0);
 	}
 }

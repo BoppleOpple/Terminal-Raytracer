@@ -7,8 +7,8 @@
 CAMERA *createCamera(double focalLength) {
 	CAMERA *c = malloc(sizeof(CAMERA));
 	*c = (CAMERA) {
-		0.0,
-		6.0,
+		1.0,
+		12.0,
 		PI / 3.0,
 		createTransform()
 	};
@@ -26,7 +26,7 @@ MATRIX *getScreenRay(CAMERA *c, int px, int py, struct winsize *outDimensions) {
 
 	MATRIX *imagePlaneSize = createVector(1.0, cos(c->fov / 2.0), sin(c->fov / 2.0));
 	MATRIX *result = createVector(1.0, screenPositionX, screenPositionY);
-	multMatrixElementwise(imagePlaneSize, result);
+	multMatrixElementwise(result, imagePlaneSize);
 	normalizeVector(result);
 	
 	return result;
