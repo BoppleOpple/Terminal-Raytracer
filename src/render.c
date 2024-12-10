@@ -1,6 +1,5 @@
 #include "render.h"
 #include "matrix.h"
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -140,14 +139,20 @@ IMPACT *getRayTriImpact(MATRIX *ray, MATRIX *rayOrigin, TRIANGLE *tri) {
 	MATRIX *vertexOffset3 = copyMatrix(negativeVertex1);
 	addMatrix(vertexOffset3, tri->vertices[2]);
 
-	if (vectorDotProduct(impactOffset1, vertexOffset2) < 0.0) return NULL;
-	if (vectorDotProduct(impactOffset1, vertexOffset3) < 0.0) return NULL;
+	if (vectorDotProduct(impactOffset1, vertexOffset2) < 0.0 || vectorDotProduct(impactOffset1, vertexOffset3) < 0.0) {
+		freeImpact(result);
+		free(result);
+		result = NULL;
+	} else {
+		multScalar(vertexOffset2, -1.0);
+		multScalar(vertexOffset3, -1.0);
 
-	multScalar(vertexOffset2, -1.0);
-	multScalar(vertexOffset3, -1.0);
-
-	if (vectorDotProduct(impactOffset2, vertexOffset2) < 0.0) return NULL;
-	if (vectorDotProduct(impactOffset3, vertexOffset3) < 0.0) return NULL;
+		if (vectorDotProduct(impactOffset2, vertexOffset2) < 0.0 || vectorDotProduct(impactOffset3, vertexOffset3) < 0.0) {
+			freeImpact(result);
+			free(result);
+			result = NULL;
+		}
+	}
 
 	freeMatrix(negativeVertex1);
 	freeMatrix(negativeVertex2);
