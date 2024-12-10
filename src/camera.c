@@ -28,6 +28,10 @@ MATRIX *getScreenRay(CAMERA *c, int px, int py, struct winsize *outDimensions) {
 	MATRIX *result = createVector(1.0, screenPositionX, screenPositionY);
 	multMatrixElementwise(result, imagePlaneSize);
 	normalizeVector(result);
+
+	freeMatrix(imagePlaneSize);
+	free(imagePlaneSize);
+	imagePlaneSize = NULL;
 	
 	return result;
 }

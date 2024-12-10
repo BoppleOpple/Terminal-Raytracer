@@ -9,7 +9,9 @@
 #define DOUBLE_STRING_LENGTH 3 + DBL_MANT_DIG - DBL_MIN_EXP
 
 MATRIX createTempMatrix(int r, int c) {
-	return (MATRIX) {r, c, malloc( sizeof(double) * r * c )};
+	MATRIX m = {r, c, malloc( sizeof(double) * r * c )};
+	fillMatrix(&m, 0.0);
+	return m;
 }
 
 MATRIX *createMatrix(int r, int c) {

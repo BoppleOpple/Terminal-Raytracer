@@ -137,8 +137,6 @@ int main(int argc, char *argv[]) {
 
 		rotateXYZ(testMesh->transform, 0.0, 0.0, 0.1);
 
-		MATRIX *rot = getRotationVector(testMesh->transform);
-
 		char *screenString = renderToString(sceneCamera, &windowDims, testMesh);
 		// printf("%s", screenString);
 		free(screenString);
@@ -147,8 +145,6 @@ int main(int argc, char *argv[]) {
 		if (debug) {
 			printf("frame %i\n", frame++);
 			printf("display: %i x %i\n", windowDims.ws_col, windowDims.ws_row);
-			printf("z: %lf\n", getElement(rot, 2, 0));
-			printVector3(rot);
 		}
 		// stop doing things!
 
