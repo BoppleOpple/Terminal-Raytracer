@@ -64,6 +64,14 @@ double determinant(MATRIX *m);
 
 MATRIX *getInverse(MATRIX *m);
 
+void rref(MATRIX *m);
+
+void scaleRow(MATRIX *m, int r, double scale);
+
+void addRowMultiple(MATRIX *m, int sourceRow, int destinationRow, double scale);
+
+void swapRows(MATRIX *m, int r1, int r2);
+
 double vectorDotProduct(MATRIX *v1, MATRIX *v2);
 
 MATRIX *vectorCrossProduct(MATRIX *v1, MATRIX *v2);

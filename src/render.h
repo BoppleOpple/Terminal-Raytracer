@@ -23,8 +23,6 @@ IMPACT *getRayMeshImpact(MATRIX *ray, MATRIX *rayOrigin, MESH *m);
 
 IMPACT *getRayTriImpact(MATRIX *ray, MATRIX *rayOrigin, TRIANGLE *tri);
 
-IMPACT *getRayPlaneImpact(MATRIX *ray, MATRIX *rayOrigin, MATRIX *normal, MATRIX *normalOrigin);
-
 void freeImpact(IMPACT* i);
 
 void printImpact(IMPACT *i);

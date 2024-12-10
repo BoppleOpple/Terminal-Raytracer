@@ -166,7 +166,7 @@ MATRIX *getInverse(MATRIX *m) {
 	MATRIX *result = createMatrix(m->rows, m->cols);
 
 	if (det == 0) {
-		printf("matrix is not invertible!");
+		printf("matrix is not invertible!\n");
 		exit(1);
 	}
 
@@ -177,6 +177,48 @@ MATRIX *getInverse(MATRIX *m) {
 	multScalar(result, 1.0/det);
 
 	return result;
+}
+
+void rref(MATRIX *m) {
+	// if matrix is singular, throw error (may change later)
+	if (m->cols == m->rows && determinant(m) == 0) {
+		printf("cannot solve linear system with a singular matrix\n");
+		exit(1);
+	}
+
+	if (m->cols < m->rows) {
+		printf("matrix is underconstrained\n");
+		exit(1);
+	}
+
+	for (int i = 0; i < m->rows; i++) {
+		scaleRow(m, i, 1.0/getElement(m, i, i));
+		for (int j = i + 1; j < m->cols; j++)
+			addRowMultiple(m, i, j, -getElement(m, j, i));
+	}
+
+	for (int i = m->rows - 1; i >= 0; i--)
+		for (int j = i - 1; j >= 0; j--)
+			addRowMultiple(m, i, j, -getElement(m, j, i));
+}
+
+void scaleRow(MATRIX *m, int r, double scale) {
+	for (int j = 0; j < m->cols; j++)
+		setElement(m, r, j, scale * getElement(m, r, j));
+}
+
+void addRowMultiple(MATRIX *m, int sourceRow, int destinationRow, double scale) {
+	for (int j = 0; j < m->cols; j++)
+		setElement(m, destinationRow, j, getElement(m, destinationRow, j) + scale * getElement(m, sourceRow, j));
+}
+
+void swapRows(MATRIX *m, int r1, int r2) {
+	double temp = 0.0;
+	for (int j = 0; j < m->cols; j++) {
+		temp = getElement(m, r1, j);
+		setElement(m, r2, j, getElement(m, r1, j));
+		setElement(m, r1, j, temp);
+	}
 }
 
 double vectorDotProduct(MATRIX *v1, MATRIX *v2) {

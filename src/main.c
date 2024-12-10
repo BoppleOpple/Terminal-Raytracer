@@ -4,13 +4,15 @@
 #include "render.h"
 #include "stringUtils.h"
 #include "transform.h"
+#include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
 #include <time.h>
 #include <unistd.h> // for sleep on linux
 
-#define FRAME_RATE 20
+#define FRAME_RATE 5
 
 const unsigned int targetMicroSeconds = 1000000 / FRAME_RATE;
 
@@ -45,8 +47,8 @@ void test() {
 	MATRIX *normal = createVector(0.0, 0.0, -1.0);
 	MATRIX *normalOrigin = createVector(0.0, 0.0, 0.0);
 
-	IMPACT *impact = getRayPlaneImpact(ray, rayOrigin, normal, normalOrigin);
-	printImpact(impact);
+	// IMPACT *impact = getRayPlaneImpact(ray, rayOrigin, normal, normalOrigin);
+	// printImpact(impact);
 
 	freeMatrix(ray);
 	freeMatrix(rayOrigin);
@@ -61,9 +63,27 @@ void test() {
 	normal = NULL;
 	normalOrigin = NULL;
 
-	freeImpact(impact);
-	free(impact);
-	impact = NULL;
+	// freeImpact(impact);
+	// free(impact);
+	// impact = NULL;
+
+	printf("\n");
+
+	MATRIX *reducableMatrix = createMatrix(2, 3);
+	setElement(reducableMatrix, 0, 0, 2.0);
+	setElement(reducableMatrix, 0, 1, 4.0);
+	setElement(reducableMatrix, 0, 2, 6.0);
+	setElement(reducableMatrix, 1, 0, 6.0);
+	setElement(reducableMatrix, 1, 1, 1.0);
+	setElement(reducableMatrix, 1, 2, 2.0);
+
+	printf("reducable matrix:\n");
+	printMatrix(reducableMatrix);
+
+	rref(reducableMatrix);
+
+	printf("reduced matrix:\n");
+	printMatrix(reducableMatrix);
 }
 
 int main(int argc, char *argv[]) {
@@ -73,7 +93,7 @@ int main(int argc, char *argv[]) {
 	char *filepath = NULL;
 	int frame = 0;
 	int loop = 1;
-	int debug = 0;
+	int debug = 1;
 
 	translateXYZ(sceneCamera->transform, -5.0, 0.0, 0.0);
 
@@ -101,29 +121,34 @@ int main(int argc, char *argv[]) {
 	LIST splitAtT = split(example, 't');
 	listPrint(&splitAtT, "\"%s\"");
 
-
+	exit(0);
 
 	MESH *testMesh = meshFromOBJ(filepath);
 	// rotateXYZ(testMesh->transform, 0, 0, PI);
 	// printMesh(testMesh);
-
+	
 	while (loop) {
 		clock_gettime(CLOCK_MONOTONIC_RAW, &frameStart);
 
 		// do things!
 		updateViewportSize(&windowDims);
 
+		clearScreen();
+
 		rotateXYZ(testMesh->transform, 0.0, 0.0, 0.1);
 
-		clearScreen();
+		MATRIX *rot = getRotationVector(testMesh->transform);
+
 		char *screenString = renderToString(sceneCamera, &windowDims, testMesh);
-		printf("%s", screenString);
+		// printf("%s", screenString);
 		free(screenString);
 		screenString = NULL;
 
 		if (debug) {
 			printf("frame %i\n", frame++);
 			printf("display: %i x %i\n", windowDims.ws_col, windowDims.ws_row);
+			printf("z: %lf\n", getElement(rot, 2, 0));
+			printVector3(rot);
 		}
 		// stop doing things!
 
