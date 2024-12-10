@@ -64,9 +64,9 @@ MATRIX *createRotationMatrixZ(double zRot) {
 }
 
 MATRIX *createRotationMatrix(MATRIX *rotVector) {
-	MATRIX *result = createRotationMatrixZ(getElement(rotVector, 0, 2));
+	MATRIX *result = createRotationMatrixZ(getElement(rotVector, 2, 0));
 
-	MATRIX *next = next = createRotationMatrixY(getElement(rotVector, 0, 1));
+	MATRIX *next = createRotationMatrixY(getElement(rotVector, 1, 0));
 	multMatrix(result, next);
 	freeMatrix(next);
 	free(next);
@@ -119,6 +119,7 @@ MATRIX *getScaleVector(TRANSFORM *t) {
 
 MATRIX *getRotationVector(TRANSFORM *t) {
 	double sinYRot = -getElement(t->rotation, 2, 0);
+	printMatrix(t->rotation);
 	if (sinYRot == 1.0) {
 		return createVector(
 			atan2(getElement(t->rotation, 0, 1), getElement(t->rotation, 0, 2)),
@@ -134,6 +135,7 @@ MATRIX *getRotationVector(TRANSFORM *t) {
 	} else {
 		double yRot = asin(sinYRot);
 		double cosYRot = cos(yRot);
+		printf("%lf\n", cosYRot);
 		return createVector(
 			atan2(getElement(t->rotation, 2, 1)/cosYRot, getElement(t->rotation, 2, 2)/cosYRot),
 			yRot,

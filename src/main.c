@@ -4,13 +4,15 @@
 #include "render.h"
 #include "stringUtils.h"
 #include "transform.h"
+#include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
 #include <time.h>
 #include <unistd.h> // for sleep on linux
 
-#define FRAME_RATE 20
+#define FRAME_RATE 5
 
 const unsigned int targetMicroSeconds = 1000000 / FRAME_RATE;
 
@@ -106,16 +108,17 @@ int main(int argc, char *argv[]) {
 	MESH *testMesh = meshFromOBJ(filepath);
 	// rotateXYZ(testMesh->transform, 0, 0, PI);
 	// printMesh(testMesh);
-
+	
 	while (loop) {
 		clock_gettime(CLOCK_MONOTONIC_RAW, &frameStart);
 
 		// do things!
 		updateViewportSize(&windowDims);
 
+		clearScreen();
+
 		rotateXYZ(testMesh->transform, 0.0, 0.0, 0.1);
 
-		clearScreen();
 		char *screenString = renderToString(sceneCamera, &windowDims, testMesh);
 		printf("%s", screenString);
 		free(screenString);
