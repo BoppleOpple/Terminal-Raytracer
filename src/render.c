@@ -112,7 +112,31 @@ IMPACT *getRayMeshImpact(MATRIX *ray, MATRIX *rayOrigin, MESH *m) { // maybe add
 }
 
 IMPACT *getRayTriImpact(MATRIX *ray, MATRIX *rayOrigin, TRIANGLE *tri) {
-	return NULL;
+	MATRIX *reparameterizationSystem = createMatrix(3, 4);
+
+	for (int i = 0; i < 3; i++) {
+		setElement(reparameterizationSystem, i, 0, getElement(tri->vertices[1], i, 0) - getElement(tri->vertices[0], i, 0));
+		setElement(reparameterizationSystem, i, 1, getElement(tri->vertices[2], i, 0) - getElement(tri->vertices[0], i, 0));
+		setElement(reparameterizationSystem, i, 2, getElement(tri->normal, i, 0));
+		setElement(reparameterizationSystem, i, 3, getElement(rayOrigin, i, 0));
+	}
+
+	rref(reparameterizationSystem);
+
+	MATRIX *intersection = copyMatrix(rayOrigin);
+	MATRIX *offset = copyMatrix(tri->normal);
+	multScalar(offset, getElement(reparameterizationSystem, 2, 3));
+	addMatrix(intersection, offset);
+
+	freeMatrix(offset);
+	free(offset);
+	offset = NULL;
+	
+	return createImpact(
+		intersection,
+		tri,
+		vectorLength(tri->normal) * getElement(reparameterizationSystem, 2, 3)
+	);
 }
 
 void clearScreen() {

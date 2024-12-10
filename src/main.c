@@ -115,17 +115,17 @@ int main(int argc, char *argv[]) {
 	printf("%s\n", first5);
 	printf("\n");
 
-	LIST wordList = splitSpaces(example);
-	listPrint(&wordList, "\"%s\"");
+	// LIST wordList = splitSpaces(example);
+	// listPrint(&wordList, "\"%s\"");
 
-	LIST splitAtT = split(example, 't');
-	listPrint(&splitAtT, "\"%s\"");
+	// LIST splitAtT = split(example, 't');
+	// listPrint(&splitAtT, "\"%s\"");
 
-	exit(0);
 
 	MESH *testMesh = meshFromOBJ(filepath);
 	// rotateXYZ(testMesh->transform, 0, 0, PI);
 	// printMesh(testMesh);
+	exit(0);
 	
 	while (loop) {
 		clock_gettime(CLOCK_MONOTONIC_RAW, &frameStart);
