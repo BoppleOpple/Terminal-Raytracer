@@ -23,4 +23,6 @@ MESH *meshFromOBJ(const char *filepath);
 
 void printMesh(MESH *m);
 
+void freeMesh(MESH *m);
+
 #endif

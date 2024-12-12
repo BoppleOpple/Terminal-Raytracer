@@ -17,4 +17,6 @@ CAMERA *createCamera(double focalLength);
 
 MATRIX *getScreenRay(CAMERA *c, int px, int py, struct winsize *outDimensions);
 
+void freeCamera(CAMERA *c);
+
 #endif

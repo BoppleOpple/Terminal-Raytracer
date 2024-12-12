@@ -30,8 +30,6 @@ MESH *meshFromOBJ(const char *filepath) {
 			continue;
 
 		char *arg = (char *) listGetElement(&objLineArguments, 0);
-		printf("%s\n", buffer);
-		listPrint(&objLineArguments, "%s");
 
 		if (strcmp(arg, "v") == 0) {
 			if (objLineArguments.size == 4) {
@@ -70,7 +68,6 @@ MESH *meshFromOBJ(const char *filepath) {
 					// polygonTextureVertices[i-1] = atoi(listGetElement(&vertexInfo, 1));
 					polygonNormals[i-1] = atoi(listGetElement(&vertexInfo, 2));
 
-					printf("%i\n", polygonNormals[i-1]);
 					listClear(&vertexInfo);
 				}
 
@@ -107,4 +104,24 @@ void printMesh(MESH *m) {
 
 	free(position);
 	position = NULL;
+}
+
+void freeMesh(MESH *m) {
+	for (int i = 0; i < m->verts.size; i++) {
+		freeMatrix(listGetElement(&m->verts, i));
+	}
+	for (int i = 0; i < m->normals.size; i++) {
+		freeMatrix(listGetElement(&m->normals, i));
+	}
+	for (int i = 0; i < m->tris.size; i++) {
+		free(listGetElement(&m->tris, i));
+	}
+
+	listClear(&m->verts);
+	listClear(&m->normals);
+	listClear(&m->tris);
+
+	freeTransform(m->transform);
+	free(m->transform);
+	m->transform = NULL;
 }

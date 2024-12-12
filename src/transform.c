@@ -221,3 +221,12 @@ void printTransform(TRANSFORM *t) {
 	printf("rotation:\n");
 	printMatrix(t->rotation);
 }
+
+void freeTransform(TRANSFORM *t) {
+	freeMatrix(t->translation);
+	freeMatrix(t->scale);
+	freeMatrix(t->rotation);
+	t->translation = NULL;
+	t->scale = NULL;
+	t->rotation = NULL;
+}

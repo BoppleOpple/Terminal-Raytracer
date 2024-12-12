@@ -9,7 +9,7 @@ CAMERA *createCamera(double focalLength) {
 	*c = (CAMERA) {
 		1.0,
 		8.0,
-		PI / 3.0,
+		PI / 2.0,
 		createTransform()
 	};
 
@@ -34,6 +34,12 @@ MATRIX *getScreenRay(CAMERA *c, int px, int py, struct winsize *outDimensions) {
 	imagePlaneSize = NULL;
 	
 	return result;
+}
+
+void freeCamera(CAMERA *c) {
+	freeTransform(c->transform);
+	free(c->transform);
+	c->transform = NULL;
 }
 
 // MATRIX getCameraProjectionMatrix(CAMERA *c, struct winsize *viewport) {

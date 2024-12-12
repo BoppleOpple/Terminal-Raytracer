@@ -163,6 +163,14 @@ int main(int argc, char *argv[]) {
 		if (deltaMicroSeconds < targetMicroSeconds) 
 			usleep(targetMicroSeconds - deltaMicroSeconds);
 
-		// exit(0);
+		// loop = 0;
 	}
+
+	freeMesh(testMesh);
+	free(testMesh);
+	testMesh = NULL;
+
+	freeCamera(sceneCamera);
+	free(sceneCamera);
+	sceneCamera = NULL;
 }

@@ -73,6 +73,7 @@ char *renderToString(CAMERA *c, struct winsize *outDimensions, MESH *m) {
 
 IMPACT *getRayMeshImpact(MATRIX *ray, MATRIX *rayOrigin, MESH *m) { // maybe add clipping distance
 	pthread_t threads[NUM_THREADS];
+	struct threadData threadData[NUM_THREADS];
 	IMPACT *closestImpact = NULL;
 
 	MATRIX *meshTransformationMatrix = getTransformMatrix(m->transform);
@@ -90,15 +91,16 @@ IMPACT *getRayMeshImpact(MATRIX *ray, MATRIX *rayOrigin, MESH *m) { // maybe add
 	// https://ramcdougal.com/threads.html
 	int trisPerThread = m->tris.size / NUM_THREADS;
 
+
+	// could decrease the number of fields in the struct, since ray, rayOrigin, bestImpact, and mesh are the same for all threads
 	for (int i = 0; i < NUM_THREADS; i++) {
-		struct threadData *data = malloc(sizeof(struct threadData));
-		data->ray = relativeRay;
-		data->rayOrigin = relativeRayOrigin;
-		data->bestImpact = &closestImpact;
-		data->mesh = m;
-		data->triStart = i * trisPerThread;
-		data->triEnd = (i + 1) * trisPerThread;
-		pthread_create(&threads[i], NULL, &getBestRayTriImpact, (void *) data);
+		threadData[i].ray = relativeRay;
+		threadData[i].rayOrigin = relativeRayOrigin;
+		threadData[i].bestImpact = &closestImpact;
+		threadData[i].mesh = m;
+		threadData[i].triStart = i * trisPerThread;
+		threadData[i].triEnd = (i + 1) * trisPerThread;
+		pthread_create(&threads[i], NULL, &getBestRayTriImpact, (void *) &threadData[i]);
 	}
 
 	for (int i = 0; i < NUM_THREADS; i++) {

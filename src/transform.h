@@ -49,4 +49,6 @@ void applyTransformation(TRANSFORM *t, MATRIX *v);
 
 void printTransform(TRANSFORM *t);
 
+void freeTransform(TRANSFORM *t);
+
 #endif
