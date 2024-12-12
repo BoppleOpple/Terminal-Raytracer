@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
 
 
 	MESH *testMesh = meshFromOBJ(filepath);
-	rotateXYZ(testMesh->transform, 0.0, PI, 0.0);
+	rotateXYZ(testMesh->transform, -PI/2.0, 0.0, PI);
 	// printMesh(testMesh);
 	
 	while (loop) {
@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
 
 		clearScreen();
 
-		rotateXYZ(testMesh->transform, 0.0, 0.0, 0.1);
+		rotateXYZ(testMesh->transform, 0.0, 0.1, 0.0);
 
 		char *screenString = renderToString(sceneCamera, &windowDims, testMesh);
 		printf("%s", screenString);

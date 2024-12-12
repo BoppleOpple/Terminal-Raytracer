@@ -5,8 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 
-// const char *CHARACTERS = " `.-:><+*o0@";
-const char *CHARACTERS = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
+const char *CHARACTERS = " `.-:\u2591\u2592\u2593\u2588";
+// const char *CHARACTERS = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
 
 IMPACT *createImpact(MATRIX *position, TRIANGLE *impactedTri, double distance) {
 	IMPACT *i = malloc(sizeof(IMPACT));
@@ -132,9 +132,18 @@ IMPACT *getRayTriImpact(MATRIX *ray, MATRIX *rayOrigin, TRIANGLE *tri) {
 	free(offset);
 	offset = NULL;
 
-	if (getElement(reparameterizationSystem, 0, 3) < 0) return NULL;
-	if (getElement(reparameterizationSystem, 1, 3) < 0) return NULL;
-	if (getElement(reparameterizationSystem, 0, 3) + getElement(reparameterizationSystem, 1, 3) > 1) return NULL;
+	if (getElement(reparameterizationSystem, 0, 3) < 0
+			|| getElement(reparameterizationSystem, 1, 3) < 0
+			|| getElement(reparameterizationSystem, 0, 3) + getElement(reparameterizationSystem, 1, 3) > 1) {
+
+		freeMatrix(reparameterizationSystem);
+		freeMatrix(intersection);
+		free(reparameterizationSystem);
+		free(intersection);
+		reparameterizationSystem = NULL;
+		intersection = NULL;
+		return NULL;
+	}
 	
 	IMPACT *impact = createImpact(
 		intersection,
