@@ -182,26 +182,37 @@ MATRIX *getInverse(MATRIX *m) {
 }
 
 void rref(MATRIX *m) {
+	if (m->cols < m->rows) {
+		printf("matrix is underconstrained\n");
+		exit(1);
+	}
+
 	// if matrix is singular, throw error (may change later)
 	if (m->cols == m->rows && determinant(m) == 0) {
 		printf("cannot solve linear system with a singular matrix\n");
 		exit(1);
 	}
 
-	if (m->cols < m->rows) {
-		printf("matrix is underconstrained\n");
-		exit(1);
-	}
-
 	for (int i = 0; i < m->rows; i++) {
+		if (getElement(m, i, i) == 0) {
+			for (int j = i + 1; j < m->rows; j++) {
+				if (getElement(m, j, i) != 0.0) {
+					swapRows(m, i, j);
+					break;
+				}
+			}
+		}
+		
+		
 		scaleRow(m, i, 1.0/getElement(m, i, i));
-		for (int j = i + 1; j < m->cols; j++)
+		for (int j = i + 1; j < m->rows; j++)
 			addRowMultiple(m, i, j, -getElement(m, j, i));
 	}
 
 	for (int i = m->rows - 1; i >= 0; i--)
 		for (int j = i - 1; j >= 0; j--)
 			addRowMultiple(m, i, j, -getElement(m, j, i));
+
 }
 
 void scaleRow(MATRIX *m, int r, double scale) {
@@ -218,8 +229,8 @@ void swapRows(MATRIX *m, int r1, int r2) {
 	double temp = 0.0;
 	for (int j = 0; j < m->cols; j++) {
 		temp = getElement(m, r1, j);
-		setElement(m, r2, j, getElement(m, r1, j));
-		setElement(m, r1, j, temp);
+		setElement(m, r1, j, getElement(m, r2, j));
+		setElement(m, r2, j, temp);
 	}
 }
 

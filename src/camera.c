@@ -8,7 +8,7 @@ CAMERA *createCamera(double focalLength) {
 	CAMERA *c = malloc(sizeof(CAMERA));
 	*c = (CAMERA) {
 		1.0,
-		12.0,
+		8.0,
 		PI / 3.0,
 		createTransform()
 	};

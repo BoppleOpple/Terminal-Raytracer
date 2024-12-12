@@ -1,4 +1,5 @@
 #include "camera.h"
+#include "mathUtils.h"
 #include "matrix.h"
 #include "mesh.h"
 #include "render.h"
@@ -70,7 +71,7 @@ void test() {
 	printf("\n");
 
 	MATRIX *reducableMatrix = createMatrix(2, 3);
-	setElement(reducableMatrix, 0, 0, 2.0);
+	setElement(reducableMatrix, 0, 0, 0.0);
 	setElement(reducableMatrix, 0, 1, 4.0);
 	setElement(reducableMatrix, 0, 2, 6.0);
 	setElement(reducableMatrix, 1, 0, 6.0);
@@ -84,6 +85,10 @@ void test() {
 
 	printf("reduced matrix:\n");
 	printMatrix(reducableMatrix);
+
+	freeMatrix(reducableMatrix);
+	free(reducableMatrix);
+	reducableMatrix = NULL;
 }
 
 int main(int argc, char *argv[]) {
@@ -93,9 +98,9 @@ int main(int argc, char *argv[]) {
 	char *filepath = NULL;
 	int frame = 0;
 	int loop = 1;
-	int debug = 1;
+	int debug = 0;
 
-	translateXYZ(sceneCamera->transform, -5.0, 0.0, 0.0);
+	translateXYZ(sceneCamera->transform, -3.0, 0.0, 0.0);
 
 	test();
 
@@ -115,17 +120,16 @@ int main(int argc, char *argv[]) {
 	printf("%s\n", first5);
 	printf("\n");
 
-	// LIST wordList = splitSpaces(example);
-	// listPrint(&wordList, "\"%s\"");
+	LIST wordList = splitSpaces(example);
+	listPrint(&wordList, "\"%s\"");
 
-	// LIST splitAtT = split(example, 't');
-	// listPrint(&splitAtT, "\"%s\"");
+	LIST splitAtT = split(example, 't');
+	listPrint(&splitAtT, "\"%s\"");
 
 
 	MESH *testMesh = meshFromOBJ(filepath);
-	// rotateXYZ(testMesh->transform, 0, 0, PI);
+	rotateXYZ(testMesh->transform, 0.0, PI, 0.0);
 	// printMesh(testMesh);
-	exit(0);
 	
 	while (loop) {
 		clock_gettime(CLOCK_MONOTONIC_RAW, &frameStart);
@@ -138,7 +142,7 @@ int main(int argc, char *argv[]) {
 		rotateXYZ(testMesh->transform, 0.0, 0.0, 0.1);
 
 		char *screenString = renderToString(sceneCamera, &windowDims, testMesh);
-		// printf("%s", screenString);
+		printf("%s", screenString);
 		free(screenString);
 		screenString = NULL;
 

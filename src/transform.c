@@ -169,7 +169,6 @@ void scaleXYZ(TRANSFORM *t, double x, double y, double z) {
 
 void rotate(TRANSFORM *t, MATRIX *rotVector) {
 	MATRIX *rotationMatrix = createRotationMatrix(rotVector);
-	printMatrix(rotationMatrix);
 	multMatrix(t->rotation, rotationMatrix);
 }
 
