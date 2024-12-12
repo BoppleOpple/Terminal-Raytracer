@@ -1,12 +1,26 @@
 #include "render.h"
+#include "mathUtils.h"
 #include "matrix.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <pthread.h>
 
-const char *CHARACTERS = " `.-:\u2591\u2592\u2593\u2588";
+
+#define NUM_THREADS 16
+
+const char *CHARACTERS = " .'`^\",:;Il!i><~+_-?[]{}1()tfjrxnuvcXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
 // const char *CHARACTERS = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
+
+struct threadData {
+	MATRIX *ray;
+	MATRIX *rayOrigin;
+	IMPACT **bestImpact;
+	MESH *mesh;
+	int triStart;
+	int triEnd;
+};
 
 IMPACT *createImpact(MATRIX *position, TRIANGLE *impactedTri, double distance) {
 	IMPACT *i = malloc(sizeof(IMPACT));
@@ -58,8 +72,8 @@ char *renderToString(CAMERA *c, struct winsize *outDimensions, MESH *m) {
 }
 
 IMPACT *getRayMeshImpact(MATRIX *ray, MATRIX *rayOrigin, MESH *m) { // maybe add clipping distance
+	pthread_t threads[NUM_THREADS];
 	IMPACT *closestImpact = NULL;
-	IMPACT *currentImpact = NULL;
 
 	MATRIX *meshTransformationMatrix = getTransformMatrix(m->transform);
 	MATRIX *inverseMeshTransformationMatrix = getInverse(meshTransformationMatrix);
@@ -72,27 +86,27 @@ IMPACT *getRayMeshImpact(MATRIX *ray, MATRIX *rayOrigin, MESH *m) { // maybe add
 	MATRIX *relativeRayOrigin = NULL;
 	multMatrixTo(inverseMeshTransformationMatrix, rayOrigin, &relativeRayOrigin);
 
-	for (int i = 0; i < m->tris.size; i++) {
-		currentImpact = getRayTriImpact(relativeRay, relativeRayOrigin, listGetElement(&m->tris, i));
 
-		if (!currentImpact)
-			continue;
+	// https://ramcdougal.com/threads.html
+	int trisPerThread = m->tris.size / NUM_THREADS;
 
-		if (!closestImpact) {
-			closestImpact = currentImpact;
-		} else if (currentImpact->impactDistance < closestImpact->impactDistance && currentImpact->impactDistance > 0.0) {
-			freeImpact(closestImpact);
-			free(closestImpact);
-			closestImpact = currentImpact;
-		} else {
-			freeImpact(currentImpact);
-			free(currentImpact);
-			currentImpact = NULL;
-		}
+	for (int i = 0; i < NUM_THREADS; i++) {
+		struct threadData *data = malloc(sizeof(struct threadData));
+		data->ray = relativeRay;
+		data->rayOrigin = relativeRayOrigin;
+		data->bestImpact = &closestImpact;
+		data->mesh = m;
+		data->triStart = i * trisPerThread;
+		data->triEnd = (i + 1) * trisPerThread;
+		pthread_create(&threads[i], NULL, &getBestRayTriImpact, (void *) data);
+	}
+
+	for (int i = 0; i < NUM_THREADS; i++) {
+		pthread_join(threads[i], NULL);
 	}
 
 	if (closestImpact)
-		multMatrixTo(meshTransformationMatrix, closestImpact->impactPosition,&closestImpact->impactPosition);
+		multMatrixTo(meshTransformationMatrix, closestImpact->impactPosition, &closestImpact->impactPosition);
 
 	freeMatrix(meshTransformationMatrix);
 	freeMatrix(inverseMeshTransformationMatrix);
@@ -109,6 +123,32 @@ IMPACT *getRayMeshImpact(MATRIX *ray, MATRIX *rayOrigin, MESH *m) { // maybe add
 
 
 	return closestImpact;
+}
+
+void *getBestRayTriImpact(void *data) {
+	struct threadData *threadData = (struct threadData *) data;
+	IMPACT *currentImpact = NULL;
+
+	for (int i = threadData->triStart; i < threadData->triEnd; i++) {
+		currentImpact = getRayTriImpact(threadData->ray, threadData->rayOrigin, listGetElement(&threadData->mesh->tris, i));
+
+		if (!currentImpact)
+			continue;
+
+		if (!*threadData->bestImpact)
+			*threadData->bestImpact = currentImpact;
+		else if (currentImpact->impactDistance < (*threadData->bestImpact)->impactDistance && currentImpact->impactDistance > 0.0) {
+			freeImpact(*threadData->bestImpact);
+			free(*threadData->bestImpact);
+			*threadData->bestImpact = currentImpact;
+		} else {
+			freeImpact(currentImpact);
+			free(currentImpact);
+			currentImpact = NULL;
+		}
+	}
+
+	return NULL;
 }
 
 IMPACT *getRayTriImpact(MATRIX *ray, MATRIX *rayOrigin, TRIANGLE *tri) {

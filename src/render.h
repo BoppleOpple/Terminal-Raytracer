@@ -21,6 +21,8 @@ void clearScreen();
 
 IMPACT *getRayMeshImpact(MATRIX *ray, MATRIX *rayOrigin, MESH *m);
 
+void *getBestRayTriImpact(void *data);
+
 IMPACT *getRayTriImpact(MATRIX *ray, MATRIX *rayOrigin, TRIANGLE *tri);
 
 void freeImpact(IMPACT* i);
