@@ -92,7 +92,7 @@ void test() {
 }
 
 int main(int argc, char *argv[]) {
-	CAMERA *sceneCamera = createCamera(1.0);
+	CAMERA *sceneCamera = createCamera(1.0, 6.0, PI / 2.0);
 	struct winsize windowDims;
 	struct timespec frameStart, frameEnd;
 	char *filepath = NULL;

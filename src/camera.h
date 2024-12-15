@@ -13,7 +13,7 @@ typedef struct {
 	TRANSFORM *transform;
 } CAMERA;
 
-CAMERA *createCamera(double focalLength);
+CAMERA *createCamera(double minDistance, double maxDistance, double fov);
 
 MATRIX *getScreenRay(CAMERA *c, int px, int py, struct winsize *outDimensions);
 

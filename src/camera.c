@@ -4,12 +4,12 @@
 #include <math.h>
 #include <stdlib.h>
 
-CAMERA *createCamera(double focalLength) {
+CAMERA *createCamera(double minDistance, double maxDistance, double fov) {
 	CAMERA *c = malloc(sizeof(CAMERA));
 	*c = (CAMERA) {
-		1.0,
-		8.0,
-		PI / 2.0,
+		minDistance,
+		maxDistance,
+		fov,
 		createTransform()
 	};
 
