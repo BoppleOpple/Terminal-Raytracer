@@ -1,4 +1,5 @@
 #include "camera.h"
+#include "debug.h"
 #include "mathUtils.h"
 #include "matrix.h"
 #include "mesh.h"
@@ -93,12 +94,19 @@ void test() {
 
 int main(int argc, char *argv[]) {
 	CAMERA *sceneCamera = createCamera(1.0, 6.0, PI / 2.0);
+	LIST frameTimes = listCreate();
 	struct winsize windowDims;
 	struct timespec frameStart, frameEnd;
+	unsigned int *deltaMicroSeconds;
 	char *filepath = NULL;
+	char *frameTimeCSVPath = "./output/frameTimes.csv";
 	int frame = 0;
 	int loop = 1;
 	int debug = 0;
+	int saveTimes = 0;
+
+	// not C89 compliant
+	_Bool godawful;
 
 	translateXYZ(sceneCamera->transform, -3.0, 0.0, 0.0);
 
@@ -147,24 +155,40 @@ int main(int argc, char *argv[]) {
 		screenString = NULL;
 
 		if (debug) {
-			printf("frame %i\n", frame++);
+			printf("frame %i\n", frame);
 			printf("display: %i x %i\n", windowDims.ws_col, windowDims.ws_row);
 		}
 		// stop doing things!
 
 		clock_gettime(CLOCK_MONOTONIC_RAW, &frameEnd);
 
-		unsigned int deltaMicroSeconds = (frameEnd.tv_sec - frameStart.tv_sec) * 1000000 + (frameEnd.tv_nsec - frameStart.tv_nsec) / 1000;
+		deltaMicroSeconds = malloc(sizeof(unsigned int));
+
+		*deltaMicroSeconds = delta_us(frameStart, frameEnd);
 		if (debug) {
 			printf("target: %u\n", targetMicroSeconds);
-			printf("delta: %u\n", deltaMicroSeconds);
+			printf("delta: %u\n", *deltaMicroSeconds);
 		}
 
-		if (deltaMicroSeconds < targetMicroSeconds) 
-			usleep(targetMicroSeconds - deltaMicroSeconds);
+		if (*deltaMicroSeconds < targetMicroSeconds) 
+			usleep(targetMicroSeconds - *deltaMicroSeconds);
 
-		// loop = 0;
+		listAppendItem(&frameTimes, deltaMicroSeconds);
+
+		if (frame >= 10)
+			loop = 0;
+
+		frame++;
 	}
+
+
+	if (saveTimes) {
+		FILE *frameTimeFile = fopen(frameTimeCSVPath, "a");
+			for (int i = 0; i < frameTimes.size; i++)
+				fprintf(frameTimeFile, (i < frameTimes.size - 1) ? "%u, " : "%u\n", *((unsigned int*) listGetElement(&frameTimes, i)));
+	}
+
+	listClear(&frameTimes);
 
 	freeMesh(testMesh);
 	free(testMesh);
@@ -173,4 +197,7 @@ int main(int argc, char *argv[]) {
 	freeCamera(sceneCamera);
 	free(sceneCamera);
 	sceneCamera = NULL;
+
+	/* C89 compliant */
+	return 0;
 }

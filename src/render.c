@@ -1,5 +1,5 @@
 #include "render.h"
-#include "mathUtils.h"
+#include "debug.h"
 #include "matrix.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,11 +41,20 @@ char *renderToString(CAMERA *c, struct winsize *outDimensions, MESH *m) {
 	char *output = malloc(sizeof(char) * outDimensions->ws_row * (outDimensions->ws_col + 1) + 1);
 	MATRIX *cameraPosition = getTranslationVector(c->transform);
 
+	struct timespec start;
+	struct timespec end;
+
 	int numCharacters = strlen(CHARACTERS);
+
+	double rayTime = 0;
 
 	for (int i = 0; i < outDimensions->ws_row; i++) {
 		for (int j = 0; j < outDimensions->ws_col; j++) {
+			clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 			MATRIX *ray = getScreenRay(c, j, i, outDimensions);
+			clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+
+			rayTime += delta_s(start, end);
 
 			IMPACT *result = getRayMeshImpact(ray, cameraPosition, m);
 
@@ -60,10 +69,13 @@ char *renderToString(CAMERA *c, struct winsize *outDimensions, MESH *m) {
 				free(result);
 				result = NULL;
 			}
+
+			
 		}
 		*(output + i * (outDimensions->ws_col + 1) + outDimensions->ws_col) = (i == outDimensions->ws_row - 1) ? 0 : '\n';
 	}
 
+	printf("ray creation time: %lf s\n", rayTime);
 	freeMatrix(cameraPosition);
 	free(cameraPosition);
 	cameraPosition = NULL;

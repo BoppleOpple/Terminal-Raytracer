@@ -1,6 +1,6 @@
-build/render: build/intermediate/main.o build/intermediate/list.o build/intermediate/matrix.o build/intermediate/mesh.o build/intermediate/stringUtils.o build/intermediate/render.o build/intermediate/transform.o build/intermediate/camera.o
+build/render: build/intermediate/main.o build/intermediate/list.o build/intermediate/matrix.o build/intermediate/mesh.o build/intermediate/stringUtils.o build/intermediate/render.o build/intermediate/transform.o build/intermediate/camera.o build/intermediate/debug.o
 	mkdir -p build
-	gcc build/intermediate/main.o build/intermediate/list.o build/intermediate/matrix.o build/intermediate/mesh.o build/intermediate/stringUtils.o build/intermediate/render.o build/intermediate/transform.o build/intermediate/camera.o -lm -g -o build/render -Wall
+	gcc build/intermediate/main.o build/intermediate/list.o build/intermediate/matrix.o build/intermediate/mesh.o build/intermediate/stringUtils.o build/intermediate/render.o build/intermediate/transform.o build/intermediate/camera.o build/intermediate/debug.o -pedantic -ansi -lm -g -o build/render -Wall
 
 build/intermediate/main.o: src/main.c
 	mkdir -p build/intermediate
@@ -33,6 +33,10 @@ build/intermediate/transform.o: src/transform.c src/transform.h
 build/intermediate/camera.o: src/camera.c src/camera.h
 	mkdir -p build/intermediate
 	gcc src/camera.c -c -g -o build/intermediate/camera.o -Wall
+
+build/intermediate/debug.o: src/debug.c src/debug.h
+	mkdir -p build/intermediate
+	gcc src/debug.c -c -g -o build/intermediate/debug.o -Wall
 
 clean:
 	rm -rf build
