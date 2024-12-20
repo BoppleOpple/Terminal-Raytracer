@@ -14,10 +14,13 @@
 #include <time.h>
 #include <unistd.h> // for sleep on linux
 
-#define FRAME_RATE 5
+#define MAX_FRAME_RATE 5
 
-const unsigned int targetMicroSeconds = 1000000 / FRAME_RATE;
+const unsigned int targetMicroSeconds = 1000000 / MAX_FRAME_RATE;
 
+/**
+ * @brief test a bunch of my functions
+ */
 void test() {
 	MATRIX *testVector1 = createVector(1.0, 1.0, 0.0);
 	MATRIX *testVector2 = createVector(2.0, 2.0, 0.0);
@@ -26,14 +29,19 @@ void test() {
 	printVector3(testVector1);
 	printf("vector b:\n");
 	printVector3(testVector2);
+
+	// test cross product
 	printf("vector a x b:\n");
 	MATRIX *result = vectorCrossProduct(testVector1, testVector2);
 	printVector3(result);
+
+	// test dot product
 	printf("vector a * b:\n");
 	double dotResult = vectorDotProduct(testVector1, testVector2);
 	printf("%lf\n", dotResult);
 	printf("\n");
 
+	// free tests
 	freeMatrix(testVector1);
 	freeMatrix(testVector2);
 	freeMatrix(result);
@@ -44,6 +52,8 @@ void test() {
 	testVector2 = NULL;
 	result = NULL;
 
+
+	// test impact math (old now)
 	MATRIX *ray = createVector(0.0, 0.0, 1.0);
 	MATRIX *rayOrigin = createVector(0.0, 0.0, -3.0);
 	MATRIX *normal = createVector(0.0, 0.0, -1.0);
@@ -71,6 +81,7 @@ void test() {
 
 	printf("\n");
 
+	// test matrix reduction with a non-singular matrix
 	MATRIX *reducableMatrix = createMatrix(2, 3);
 	setElement(reducableMatrix, 0, 0, 0.0);
 	setElement(reducableMatrix, 0, 1, 4.0);
@@ -90,9 +101,41 @@ void test() {
 	freeMatrix(reducableMatrix);
 	free(reducableMatrix);
 	reducableMatrix = NULL;
+
+
+	// test string splitting
+	char example[] = "this is a test string.";
+
+	char *first5 = slice(example, 0, 5);
+
+	printf("Test string:\n");
+	printf("%s\n", example);
+	printf("Truncated:\n");
+	printf("%s\n", first5);
+	printf("\n");
+
+	LIST wordList = splitSpaces(example);
+	listPrint(&wordList, "\"%s\"");
+
+	LIST splitAtT = split(example, 't');
+	listPrint(&splitAtT, "\"%s\"");
+
+	listClear(&wordList);
+	listClear(&splitAtT);
+	free(first5);
+	first5 = NULL;
+
 }
 
+/**
+ * @brief Main function
+ *
+ * Handles i/o and rendering loop, takes a path to a .obj file
+ */
 int main(int argc, char *argv[]) {
+	// initialize all the stuff, could be defines for a bunch of these but oh well
+	// maybe i'll do that later actually (TODO)
+
 	CAMERA *sceneCamera = createCamera(1.0, 6.0, PI / 2.0);
 	FILE *frameTimeFile;
 	FILE *frameFile;
@@ -110,50 +153,47 @@ int main(int argc, char *argv[]) {
 	int saveTimes = 0;
 	int saveFrames = 1;
 
+	// initialize the camera at not the origin
+
 	translateXYZ(sceneCamera->transform, -3.0, 0.0, 0.0);
 
+	// run "tests" (these are barely tests :P)
 	test();
 
+	// check for the mesh file
 	if (argc < 2) {
 		printf("please pass a mesh (.obj) file.\n");
 		return 1;
 	}
 	filepath = argv[1];
 
-	char example[] = "this is a test string.";
 
-	char *first5 = slice(example, 0, 5);
-
-	printf("Test string:\n");
-	printf("%s\n", example);
-	printf("Truncated:\n");
-	printf("%s\n", first5);
-	printf("\n");
-
-	LIST wordList = splitSpaces(example);
-	listPrint(&wordList, "\"%s\"");
-
-	LIST splitAtT = split(example, 't');
-	listPrint(&splitAtT, "\"%s\"");
-
-
-	MESH *testMesh = meshFromOBJ(filepath);
-	rotateXYZ(testMesh->transform, -PI/2.0, 0.0, PI);
+	// initialize a mesh rotated somehow, depending on the mesh
+	MESH *renderedMesh = meshFromOBJ(filepath);
+	rotateXYZ(renderedMesh->transform, -PI/2.0, 0.0, PI);
 	// printMesh(testMesh);
 	
+
+	// rendering loop
 	while (loop) {
+		// get frameTime for masx framerate
 		clock_gettime(CLOCK_MONOTONIC_RAW, &frameStart);
 
 		// do things!
 		updateViewportSize(&windowDims);
 
+
+		// do the actual rendering
 		clearScreen();
 
-		rotateXYZ(testMesh->transform, 0.0, 0.1, 0.0);
+		// spin a bit each frame
+		rotateXYZ(renderedMesh->transform, 0.0, 0.1, 0.0);
 
-		char *screenString = renderToString(sceneCamera, &windowDims, testMesh);
+		// print to screen
+		char *screenString = renderToString(sceneCamera, &windowDims, renderedMesh);
 		printf("%s", screenString);
 
+		// save to file
 		if (saveFrames) {
 			char frameOutputPath[1024];
 			sprintf(frameOutputPath, frameOutputFormat, frame);
@@ -161,6 +201,7 @@ int main(int argc, char *argv[]) {
 			fprintf(frameFile, "%s", screenString);
 		}
 
+		// clean up a bit
 		free(screenString);
 		screenString = NULL;
 
@@ -172,6 +213,7 @@ int main(int argc, char *argv[]) {
 
 		clock_gettime(CLOCK_MONOTONIC_RAW, &frameEnd);
 
+		// calculate deltaTime
 		deltaMicroSeconds = malloc(sizeof(unsigned int));
 
 		*deltaMicroSeconds = delta_us(frameStart, frameEnd);
@@ -180,34 +222,36 @@ int main(int argc, char *argv[]) {
 			printf("delta: %u\n", *deltaMicroSeconds);
 		}
 
-		if (*deltaMicroSeconds < targetMicroSeconds) 
-			usleep(targetMicroSeconds - *deltaMicroSeconds);
-
 		listAppendItem(&frameTimes, deltaMicroSeconds);
 
 		if (numFrames != -1 && frame >= numFrames)
 			loop = 0;
 
+		if (*deltaMicroSeconds < targetMicroSeconds) 
+			usleep(targetMicroSeconds - *deltaMicroSeconds);
+
+		free(deltaMicroSeconds);
 		frame++;
 	}
 
-
+	// save frame times for debugging
 	if (saveTimes) {
 		frameTimeFile = fopen(frameTimeCSVPath, "a");
 		for (int i = 0; i < frameTimes.size; i++)
 			fprintf(frameTimeFile, (i < frameTimes.size - 1) ? "%u, " : "%u\n", *((unsigned int*) listGetElement(&frameTimes, i)));
 	}
 
+	// clear memory
 	listClear(&frameTimes);
 
-	freeMesh(testMesh);
-	free(testMesh);
-	testMesh = NULL;
+	freeMesh(renderedMesh);
+	free(renderedMesh);
+	renderedMesh = NULL;
 
 	freeCamera(sceneCamera);
 	free(sceneCamera);
 	sceneCamera = NULL;
 
-	/* C89 compliant */
+	// leave
 	return 0;
 }

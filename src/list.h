@@ -51,10 +51,16 @@ void *listGetElement(LIST *list, int i);
 
 #ifndef LIST_LIST_FREE
 #define LIST_LIST_FREE
+/*
+ * frees the contents of the list
+**/
 void listClear(LIST *list);
 #endif
 
 #ifndef LIST_LIST_PRINT
 #define LIST_LIST_PRINT
+/*
+ * prints all the contents of the list
+**/
 void listPrint(LIST *list, const char *format);
 #endif

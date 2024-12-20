@@ -78,6 +78,7 @@ void listClear(LIST *list) {
 }
 
 void listPrint(LIST *list, const char *format) {
+	// print each element according to some specified format
 	printf("[ ");
 
 	for (int i = 0; i < list->size; i++) {
