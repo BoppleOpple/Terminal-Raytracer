@@ -94,19 +94,21 @@ void test() {
 
 int main(int argc, char *argv[]) {
 	CAMERA *sceneCamera = createCamera(1.0, 6.0, PI / 2.0);
+	FILE *frameTimeFile;
+	FILE *frameFile;
 	LIST frameTimes = listCreate();
 	struct winsize windowDims;
 	struct timespec frameStart, frameEnd;
 	unsigned int *deltaMicroSeconds;
 	char *filepath = NULL;
 	char *frameTimeCSVPath = "./output/frameTimes.csv";
+	char *frameOutputFormat = "./output/frame_%i.txt";
 	int frame = 0;
+	int numFrames = 10;
 	int loop = 1;
 	int debug = 0;
 	int saveTimes = 0;
-
-	// not C89 compliant
-	_Bool godawful;
+	int saveFrames = 1;
 
 	translateXYZ(sceneCamera->transform, -3.0, 0.0, 0.0);
 
@@ -151,6 +153,14 @@ int main(int argc, char *argv[]) {
 
 		char *screenString = renderToString(sceneCamera, &windowDims, testMesh);
 		printf("%s", screenString);
+
+		if (saveFrames) {
+			char frameOutputPath[1024];
+			sprintf(frameOutputPath, frameOutputFormat, frame);
+			frameFile = fopen(frameOutputPath, "w");
+			fprintf(frameFile, "%s", screenString);
+		}
+
 		free(screenString);
 		screenString = NULL;
 
@@ -175,7 +185,7 @@ int main(int argc, char *argv[]) {
 
 		listAppendItem(&frameTimes, deltaMicroSeconds);
 
-		if (frame >= 10)
+		if (numFrames != -1 && frame >= numFrames)
 			loop = 0;
 
 		frame++;
@@ -183,9 +193,9 @@ int main(int argc, char *argv[]) {
 
 
 	if (saveTimes) {
-		FILE *frameTimeFile = fopen(frameTimeCSVPath, "a");
-			for (int i = 0; i < frameTimes.size; i++)
-				fprintf(frameTimeFile, (i < frameTimes.size - 1) ? "%u, " : "%u\n", *((unsigned int*) listGetElement(&frameTimes, i)));
+		frameTimeFile = fopen(frameTimeCSVPath, "a");
+		for (int i = 0; i < frameTimes.size; i++)
+			fprintf(frameTimeFile, (i < frameTimes.size - 1) ? "%u, " : "%u\n", *((unsigned int*) listGetElement(&frameTimes, i)));
 	}
 
 	listClear(&frameTimes);
