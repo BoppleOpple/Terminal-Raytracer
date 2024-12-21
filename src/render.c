@@ -8,7 +8,7 @@
 #include <pthread.h>
 
 // default number of threads for multithreading
-#define NUM_THREADS 1
+#define NUM_THREADS 16
 
 const char *CHARACTERS = " .'`^\",:;Il!i><~+_-?[]{}1()tfjrxnuvcXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
 // const char *CHARACTERS = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";

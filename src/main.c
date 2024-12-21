@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
 	// initialize all the stuff, could be defines for a bunch of these but oh well
 	// maybe i'll do that later actually (TODO)
 
-	CAMERA *sceneCamera = createCamera(1.0, 6.0, PI / 2.0);
+	CAMERA *sceneCamera = createCamera(1.0, 5.5, PI / 2.0);
 	FILE *frameTimeFile;
 	FILE *frameFile;
 	LIST frameTimes = listCreate();
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
 	char *frameTimeCSVPath = "./output/frameTimes.csv";
 	char *frameOutputFormat = "./output/frame_%i.txt";
 	int frame = 0;
-	int numFrames = 10;
+	int numFrames = 60;
 	int loop = 1;
 	int debug = 0;
 	int saveTimes = 0;
