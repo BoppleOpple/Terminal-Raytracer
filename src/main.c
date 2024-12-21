@@ -230,7 +230,6 @@ int main(int argc, char *argv[]) {
 		if (*deltaMicroSeconds < targetMicroSeconds) 
 			usleep(targetMicroSeconds - *deltaMicroSeconds);
 
-		free(deltaMicroSeconds);
 		frame++;
 	}
 
@@ -241,7 +240,7 @@ int main(int argc, char *argv[]) {
 			fprintf(frameTimeFile, (i < frameTimes.size - 1) ? "%u, " : "%u\n", *((unsigned int*) listGetElement(&frameTimes, i)));
 	}
 
-	// clear memory
+	// free memory
 	listClear(&frameTimes);
 
 	freeMesh(renderedMesh);

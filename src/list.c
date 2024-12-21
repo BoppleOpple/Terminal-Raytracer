@@ -68,6 +68,9 @@ void *listGetElement(LIST *list, int i) {
 }
 
 void listClear(LIST *list) {
+	for (int i = 0; i < list->size; i++)
+		if (listGetElement(list, i))
+			free(listGetElement(list, i));
 	// free the array
 	free(list->array);
 
