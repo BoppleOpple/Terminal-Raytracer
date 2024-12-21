@@ -1,7 +1,8 @@
 # Terminal Raytracer
 This repository is for a horrible renderer written in c that will pivot a camera
 mesh around a mesh and render a depth map to stdout (very very slowly) written
-from scratch.
+from scratch. This program uses multithreading, though it may be best to set
+`NUM_THREADS` in `render.c` to `1` if using with valgrind.
 # Running
 Download the code and run `make` in the root directory, then run
 `./build/render path/to/file.obj`. For convenience, the code is currently
